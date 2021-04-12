@@ -1,0 +1,8 @@
+function tom_HT_image(projectstruct,imageid)
+
+this.image = [];
+
+
+
+
+this = class(this,'tom_HT_imageseries');

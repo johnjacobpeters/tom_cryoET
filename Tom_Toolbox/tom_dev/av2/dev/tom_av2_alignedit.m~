@@ -1,0 +1,79 @@
+function tom_av2_align_hightolow(inalignfile,outalignfile,verboseflag)
+% TOM_AV2_ALIGN_HIGHTOLOW automatically picks particles from the low
+% defocus series by using the particles from the high
+% Syntax:
+% [euler_out shift_out rott]=tom_sum_rotation(rots,shifts)
+%
+% Input:
+% rots                  N x 3 matrix with Euler angles, like this:
+%                         rots = [phi[1] psi[1] theta[1]; ... phi[N] psi[N] theta[N]];                          
+% shifts               N x 3 matrix with translations, like this:
+%                         shifts = [x[1] y[1] z[1]; ... x[N] y[N] z[N]]; 
+%
+%
+% Ouput:
+% euler_out        resulting Euler angles
+% shift_out         resulting translation vector
+% rott                  resulting rotation matrix
+%
+% Example:
+% [euler_out shift_out rott]=tom_sum_rotation([10 20 30; -20 -10 -30],[5 5 5; 5 5 5]);
+%
+%
+% For more information about 3d Euler rotation visit:
+% wiki -> Definitions -> Overview 3d Euler rotation -> 
+% Rotation matrices, zxz and zyz conventions
+% 
+% For more information about sequential translation and Euler rotation visit:
+% wiki -> Definitions -> Overview 3d Euler rotation -> 
+% Sequential translation and rotation
+%
+%
+%
+%   Copyright (c) 2005
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute for Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+try
+    s = load(inalignfile);
+catch
+    error('Input alignment file could not be loaded.');
+end
+
+inalign = s.align2d;
+
+filename_cache = '';
+
+outalign = inalign;
+h = tom_reademheader(inalign(1).filename);
+mask_im = tom_spheremask(ones(h.Header.Size(1)./4,h.Header.Size(2)./4),h.Header.Size(2)./8-20,16);
+
+for i=1:size(inalign,2)
+    outalign(i).filename = regexprep(inalign(i).filename,'high', 'low');
+    
+    if ~isequal(filename_cache,inalign(i).filename)
+    
+        im_h = tom_emreadc(inalign(i).filename,'resample',[4 4 4]);
+        im_l = tom_emreadc(outalign(i).filename,'resample',[4 4 4]);
+        im_h = tom_norm(double(im_h.Value),'phase');
+        im_l = tom_norm(double(im_l.Value),'phase');
+    
+        [angle_out shift_out aligned_part]=tom_av2_align(im_h,im_l,mask_im);
+        r = tom_pointrotate([shift_out(1).*4, shift_out(2).*4,0],angle_out,0,0);
+        filename_cache = inalign(i).filename;
+    end
+
+    outalign(i).position.x = round(inalign(i).position.x + r(1));
+    outalign(i).position.y = round(inalign(i).position.y + r(2));
+
+    if verboseflag == 1 && mod(i,100) == 0 
+        disp([num2str(i) ' of ' num2str(size(inalign,2)) ' particles done']);
+    end
+    
+end
+
+align2d = outalign;
+save(outalignfile,'align2d');

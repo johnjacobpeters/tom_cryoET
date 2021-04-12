@@ -1,0 +1,55 @@
+function tom_cov_paralell(infilename,outfilename,paralell)
+
+
+
+h=tom_reademheader(infile);
+sz_m=h.Header.Size;
+num_of_tasks=paraell.number_of_tasks;
+%max_lost_packages=paraell.packageloss;
+jobmanager=paraell.jobmanager;
+
+
+[a,b]=system(['chmod -R ugo+rwx ' file_path '/tmp/']);
+jm = findResource('jobmanager','name',jobmanager);
+% set(jm.jobs,'MaximumNumberOfWorkers',40);
+result_p=tom_get_paraell_results(jm,'hosts');
+disp(['classifying on ' num2str(size(result_p,1)) ' hosts']);
+for iii=1:size(result_p,1)
+    disp(result_p{iii});
+end;
+clear('result_p');
+j = createJob(jm,'Name','demojob');
+
+pdd={'/fs/bmsan/apps/tom_dev/IOfun' '/fs/bmsan/apps/tom_dev/Filtrans/'  '/fs/bmsan/apps/tom_dev/Analysis/' '/fs/bmsan/apps/tom_dev/Misc/' '/fs/bmsan/apps/tom_dev/Sptrans/' ...
+    '/fs/bmsan/apps/tom_dev/Geom/' '/fs/bmsan/apps/tom_dev/av2/'  };
+set(j,'FileDependencies',pdd)
+pdd2={[root_path_stack] [root_path_ref]};
+set(j,'PathDependencies',pdd2);
+rehash toolbox;
+
+%set(j,'FileDependencies',{'/fs/bmsan/apps/tom_dev/av2/tom_av2_multi_ref_alignment.m'})
+
+packages=tom_calc_packages(num_of_tasks,sz_m(2));
+for i=1:num_of_tasks
+    createTask(j,@tom_cov_paralell_worker,1,{infilename,outfilename,filter_param,correction_flag,2,packages(i,1:2),i});
+end;
+submit(j);
+%tom_disp_paraell_progress(j,packages(:,3));
+waitForState(j);
+out = getAllOutputArguments(j);
+[result_p errorsum]=tom_get_paraell_results(j);
+if (errorsum > 0);
+    for i=1:size(result_p,1)
+        disp(['Hostname: ' result_p{i,1} '  Error: ' result_p{i,2}]);
+    end;
+end;
+destroy(j);
+
+
+
+
+
+
+
+
+tom_cov_paralell_worker(infile,outfile,package);

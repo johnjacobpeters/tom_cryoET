@@ -1,0 +1,5 @@
+function id = get_micrographid_from_filename(this,micrographname)
+
+result = fetch(this.projectstruct.conn,['SELECT micrograph_id FROM micrographs WHERE filename = ''' micrographname ''' AND projects_project_id = ' num2str(this.projectstruct.projectid)]);
+
+id = result.micrograph_id;

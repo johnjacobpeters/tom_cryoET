@@ -1,0 +1,323 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>tom_av2_permute_bg</title><meta name="generator" content="MATLAB 7.9"><meta name="date" content="2010-03-02"><meta name="m-file" content="tom_av2_permute_bg"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> tom_av2_permute_bg(doc_filename,f_mask3d)
+<span class="comment">%TOM_AV2_PERMUTE_BG premutes background pixels</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%  tom_av2_permute_bg(f_part_stack,f_part_struct,f_mask3d)</span>
+<span class="comment">%</span>
+<span class="comment">%  TOM_AV2_PERMUTE_BG premutes background pixels</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%PARAMETERS</span>
+<span class="comment">%</span>
+<span class="comment">%  INPUT</span>
+<span class="comment">%   f_part_stack           *.doc filename use abs filename (... for further processing)</span>
+<span class="comment">%   f_part_struct          name of output em stack</span>
+<span class="comment">%   f_mask3d               name of the output struct name</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%  OUTPUT</span>
+<span class="comment">%</span>
+<span class="comment">%EXAMPLE</span>
+<span class="comment">%</span>
+<span class="comment">%  tom_av2_permute_bg('st_out.em','st_out.mat','mask3d.em');</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%REFERENCES</span>
+<span class="comment">%</span>
+<span class="comment">%SEE ALSO</span>
+<span class="comment">%   tom_av2_em_classify3d</span>
+<span class="comment">%</span>
+<span class="comment">%   created by FB 08/09/09</span>
+<span class="comment">%</span>
+<span class="comment">%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',</span>
+<span class="comment">%   Journal of Structural Biology, 149 (2005), 227-234.</span>
+<span class="comment">%</span>
+<span class="comment">%   Copyright (c) 2004-2007</span>
+<span class="comment">%   TOM toolbox for Electron Tomography</span>
+<span class="comment">%   Max-Planck-Institute of Biochemistry</span>
+<span class="comment">%   Dept. Molecular Structural Biology</span>
+<span class="comment">%   82152 Martinsried, Germany</span>
+<span class="comment">%   http://www.biochem.mpg.de/tom</span>
+
+
+
+
+
+
+mask3d=tom_emread(f_mask3d);
+mask3d=mask3d.Value;
+
+doc=tom_xmippdocread(doc_filename);
+
+fprintf(<span class="string">'%s '</span>, [<span class="string">'Converting Angles: '</span> ]);
+
+num_of_entries=size(doc,1);
+
+ref_nr=zeros(num_of_entries,1);
+euler_ang_zxz=zeros(num_of_entries,3);
+euler_ang_zyz=zeros(num_of_entries,3);
+euler_ang_zxz_proj=zeros(max([doc(:).ref]),3);
+
+<span class="keyword">for</span> i=1:num_of_entries
+    ref_nr(i)=doc(i).ref;
+    [xx,angles] = tom_eulerconvert_xmipp(doc(i).rot, doc(i).tilt, doc(i).psi);
+    euler_ang_zxz(i,:)=angles;
+    euler_ang_zyz(i,:)=[doc(i).rot doc(i).tilt doc(i).psi];
+    [aa tttemp]=tom_eulerconvert_xmipp(doc(i).rot, doc(i).tilt, 0);
+    euler_ang_zxz_proj(doc(i).ref,:)=tttemp;
+    <span class="keyword">if</span> (mod(i,2000)==0)
+        fprintf(<span class="string">'%s'</span>,<span class="string">'.'</span>);
+    <span class="keyword">end</span>;
+<span class="keyword">end</span>;
+fprintf(<span class="string">'%s \n'</span>,<span class="string">'done!'</span>);
+
+
+all_cl=unique([doc(1:end).ref]);
+
+cl_db=zeros(64,64);
+
+figure;
+
+<span class="keyword">for</span> i=1:length(all_cl)
+    cl_idx=find([doc(:).ref]==all_cl(i));
+    mask=sum(tom_rotate(mask3d,euler_ang_zxz(cl_idx(1),:)),3)&gt;0;
+    <span class="keyword">try</span>
+        <span class="keyword">for</span> ii=1:length(cl_idx)
+
+            part_idx=cl_idx(ii);
+
+            tmp_im=tom_spiderread(doc(part_idx).name);
+            tmp_im=tmp_im.Value;
+
+            <span class="comment">%rotate Back!</span>
+            tmp_sh=[-doc(part_idx).xoff -doc(part_idx).yoff];
+            <span class="keyword">if</span> (doc(part_idx).flip==0)
+                mask_alg=tom_shift(tom_rotate(mask, -euler_ang_zyz(part_idx,3)),tmp_sh);
+            <span class="keyword">else</span>
+                mask_alg=(tom_shift(tom_rotate(mask,-euler_ang_zyz(part_idx,3)),[-tmp_sh(1) tmp_sh(2)]));
+                mask_alg=tom_mirror(mask_alg,<span class="string">'x'</span>);
+                disp(<span class="string">'Flip'</span>);
+            <span class="keyword">end</span>;
+
+            SUBPLOT(2,1,1); tom_imagesc(mask_alg);
+            SUBPLOT(2,1,2); tom_imagesc(tom_filter(tmp_im,2));
+            SUBPLOT(2,1,3); tom_imagesc(tom_filter(tmp_im,2).*mask_alg);
+
+            indd=find(mask&gt;0.1);
+            ind_rand=randperm(length(indd));
+            tmp_im(indd)=tmp_im(indd(ind_rand));
+
+<span class="comment">%             [a b c]=fileparts(st.part_names{part_idx});</span>
+<span class="comment">%             new_name=[a '_perm/' b c];</span>
+<span class="comment">%             warning off;</span>
+<span class="comment">%             mkdir([a '_perm/']);</span>
+<span class="comment">%             warning on;</span>
+<span class="comment">%             tom_spiderwrite(new_name,im_tmp_alg);</span>
+        <span class="keyword">end</span>;
+    <span class="keyword">catch</span> ME
+        disp([<span class="string">'Error: '</span> doc(part_idx).name])
+        disp(ME.message);
+    <span class="keyword">end</span>;
+    <span class="comment">%debug it baby</span>
+    cl_db=zeros(64,64);
+    disp([num2str(i) <span class="string">' of '</span> num2str(length(all_cl)) <span class="string">' done!'</span> ]);
+<span class="keyword">end</span>;
+</pre><pre class="codeoutput">Input argument "f_mask3d" is undefined.
+
+Error in ==&gt; tom_av2_permute_bg at 47
+mask3d=tom_emread(f_mask3d);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.9<br></p></div><!--
+##### SOURCE BEGIN #####
+function tom_av2_permute_bg(doc_filename,f_mask3d)
+%TOM_AV2_PERMUTE_BG premutes background pixels
+%   
+%
+%  tom_av2_permute_bg(f_part_stack,f_part_struct,f_mask3d)
+%
+%  TOM_AV2_PERMUTE_BG premutes background pixels
+%  
+%
+%PARAMETERS
+%
+%  INPUT
+%   f_part_stack           *.doc filename use abs filename (... for further processing)
+%   f_part_struct          name of output em stack
+%   f_mask3d               name of the output struct name 
+%   
+%
+%  OUTPUT
+%
+%EXAMPLE
+%     
+%  tom_av2_permute_bg('st_out.em','st_out.mat','mask3d.em');
+%
+%
+%REFERENCES
+%
+%SEE ALSO
+%   tom_av2_em_classify3d
+%
+%   created by FB 08/09/09
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2007
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+
+
+
+
+
+mask3d=tom_emread(f_mask3d);
+mask3d=mask3d.Value;
+
+doc=tom_xmippdocread(doc_filename);
+
+fprintf('%s ', ['Converting Angles: ' ]); 
+
+num_of_entries=size(doc,1);
+
+ref_nr=zeros(num_of_entries,1);
+euler_ang_zxz=zeros(num_of_entries,3);
+euler_ang_zyz=zeros(num_of_entries,3);
+euler_ang_zxz_proj=zeros(max([doc(:).ref]),3);
+
+for i=1:num_of_entries
+    ref_nr(i)=doc(i).ref;
+    [xx,angles] = tom_eulerconvert_xmipp(doc(i).rot, doc(i).tilt, doc(i).psi);
+    euler_ang_zxz(i,:)=angles;
+    euler_ang_zyz(i,:)=[doc(i).rot doc(i).tilt doc(i).psi];
+    [aa tttemp]=tom_eulerconvert_xmipp(doc(i).rot, doc(i).tilt, 0);
+    euler_ang_zxz_proj(doc(i).ref,:)=tttemp;
+    if (mod(i,2000)==0)    
+        fprintf('%s','.');
+    end;
+end;
+fprintf('%s \n','done!');
+
+
+all_cl=unique([doc(1:end).ref]);
+
+cl_db=zeros(64,64);
+
+figure;
+
+for i=1:length(all_cl)
+    cl_idx=find([doc(:).ref]==all_cl(i));
+    mask=sum(tom_rotate(mask3d,euler_ang_zxz(cl_idx(1),:)),3)>0;
+    try
+        for ii=1:length(cl_idx)
+            
+            part_idx=cl_idx(ii);
+            
+            tmp_im=tom_spiderread(doc(part_idx).name);
+            tmp_im=tmp_im.Value;
+            
+            %rotate Back!
+            tmp_sh=[-doc(part_idx).xoff -doc(part_idx).yoff];
+            if (doc(part_idx).flip==0)
+                mask_alg=tom_shift(tom_rotate(mask, -euler_ang_zyz(part_idx,3)),tmp_sh);
+            else
+                mask_alg=(tom_shift(tom_rotate(mask,-euler_ang_zyz(part_idx,3)),[-tmp_sh(1) tmp_sh(2)]));
+                mask_alg=tom_mirror(mask_alg,'x');
+                disp('Flip');
+            end;
+            
+            SUBPLOT(2,1,1); tom_imagesc(mask_alg);
+            SUBPLOT(2,1,2); tom_imagesc(tom_filter(tmp_im,2));
+            SUBPLOT(2,1,3); tom_imagesc(tom_filter(tmp_im,2).*mask_alg);
+            
+            indd=find(mask>0.1);
+            ind_rand=randperm(length(indd));
+            tmp_im(indd)=tmp_im(indd(ind_rand));
+            
+%             [a b c]=fileparts(st.part_names{part_idx});
+%             new_name=[a '_perm/' b c];
+%             warning off;
+%             mkdir([a '_perm/']);
+%             warning on;
+%             tom_spiderwrite(new_name,im_tmp_alg);
+        end;
+    catch ME
+        disp(['Error: ' doc(part_idx).name])
+        disp(ME.message);
+    end;
+    %debug it baby
+    cl_db=zeros(64,64);
+    disp([num2str(i) ' of ' num2str(length(all_cl)) ' done!' ]);
+end;
+
+
+##### SOURCE END #####
+--></body></html>

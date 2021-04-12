@@ -1,0 +1,128 @@
+function new_idx=tom_av2_high2low_match(f_align_high,f_align_low,max_sh,radius)
+
+
+DB_flag=1;
+
+
+load(f_align_high);
+align_high=align2d;
+load(f_align_low);
+align_low=align2d;
+
+filename_cache='';
+
+new_idx=zeros(size(align_high,2),1);
+
+tic;
+for i=1:size(align_high,2)
+
+   %only align files if particle is on a new file
+    if ~isequal(filename_cache,align_high(1,i).filename)
+        
+        f_name_low=strrep(align_high(1,i).filename,'/high_corr/','/low_corr/');
+        [pos_low start_high]=get_pos_per_img(align_high,align_high(1,i).filename);
+        [pos_high start_low]=get_pos_per_img(align_low,f_name_low);
+        sh=calc_shift(pos_high,pos_low,max_sh);
+        if (DB_flag==1)
+            im_high=tom_emreadc(align_high(1,i).filename);
+            figure; tom_imagesc(im_high.Value);
+            for i_db=1:size(pos_high,2)
+               hold on; plot(pos_high(1,i_db),pos_high(2,i_db),'ro'); hold off;
+            end;
+            im_low=tom_emreadc(f_name_low);
+            figure; tom_imagesc(im_low.Value);
+            for i_db=1:size(pos_low,2)
+                 hold on; plot(pos_low(1,i_db),pos_low(2,i_db),'ro'); hold off;
+            end;
+        end;
+        
+        
+        pos_low= pos_low+repmat(sh,[size(pos_low,2) 1])'; 
+       
+        if (DB_flag==1)
+             figure; tom_imagesc(im_high.Value);
+            for i_db=1:size(pos_low,2)
+                 hold on; plot(pos_low(1,i_db),pos_low(2,i_db),'g+'); hold off;
+                hold on; plot(pos_high(1,i_db),pos_high(2,i_db),'ro'); hold off;
+            end;
+        end;
+        
+        
+        filename_cache=align_high(1,i).filename;
+        zz_pos=1;
+    end
+    
+    %match it man
+  
+    
+   [pointidx, pointcoords, distance] = tom_nearestpoint(pos_high(:,zz_pos)', pos_low');
+   
+   if(distance < radius)
+       new_idx(i)=start_low+pointidx-1;
+   else
+       new_idx(i)=0;
+   end;
+   
+   zz_pos=zz_pos+1;
+    
+% 
+    if  mod(i,2000) == 0
+        toc;
+        disp([num2str(i) ' of ' num2str(size(align_high,2)) ' particles done']);
+        tic;
+    end;
+
+end
+
+
+function sh=calc_shift(pos_high,pos_low,max_sh)
+
+
+max_sz=max([max(max(pos_low)) max(max(pos_high))]);
+mid=floor(max_sz./2)+1;
+mask=tom_spheremask(ones(max_sz,max_sz),max_sh);
+
+tmp_img_low=zeros(max_sz,max_sz);
+tmp_img_high=zeros(max_sz,max_sz);
+
+for i=1:size(pos_high,2)
+    tmp_img_high(pos_high(1,i),pos_high(2,i))=1;
+end;
+
+for i=1:size(pos_low,2)
+    tmp_img_low(pos_low(1,i),pos_low(2,i))=1;
+end;
+
+cc=tom_corr(tmp_img_low,tmp_img_high,'norm');
+
+[a b]=tom_peak(cc.*mask);
+
+
+sh=a-mid;
+
+
+
+
+
+
+function [pos start]=get_pos_per_img(align,img_name)
+
+
+pos=zeros(2,40000);
+zz=1;
+for i=1:size(align,2)
+    if (strcmp(align(1,i).filename,img_name))
+        real_idx(zz)=i;
+        pos(:,zz)=[align(1,i).position.x align(1,i).position.y]';
+        zz=zz+1;
+    end;
+end;
+if (zz==1)
+    start=-1;
+    return;
+end;
+
+start=min(real_idx);
+tmp=pos(:,1:zz-1);
+clear('pos');
+pos=tmp;

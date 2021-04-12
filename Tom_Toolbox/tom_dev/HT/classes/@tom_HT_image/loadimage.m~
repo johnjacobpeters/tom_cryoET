@@ -1,0 +1,21 @@
+function this = loadimage(this,imageid)
+
+if ischar(imageid)
+    imageid = get_imageid_from_filename(this,imageid);
+end
+
+this.image = get_fullname_from_imageid(this,imageid);
+
+if ~isempty(outsize)
+    this.image = tom_HT_fileread(image,'thumbnail',outsize);
+else
+    this.image = tom_HT_fileread(image);
+end
+
+result = fetch(this.projectstruct.conn,['SELECT date FROM images WHERE image_id = ' num2str(imageid)]);
+
+this.image.Header.Date = result.date{1};
+this.image.Header.Date = image.Header.Date(1:end-2);
+
+
+

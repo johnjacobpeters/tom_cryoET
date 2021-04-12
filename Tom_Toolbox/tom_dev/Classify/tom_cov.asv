@@ -1,0 +1,20 @@
+function m_out=tom_cov(m)
+
+
+for i=1:size(m,2)
+    for ii=(i):(size(m,2))
+         m_out(i,ii)=sum( (m(:,i)-(mean(m(:,i)))) .*(m(:,ii)-mean(m(:,ii))) )./ (size(m(:,i),1)-1);
+    end;
+end;
+
+%fill up symmetric values
+for i=1:size(m_out,1)
+    for
+end;
+
+
+
+
+
+
+

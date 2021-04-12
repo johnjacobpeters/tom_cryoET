@@ -1,0 +1,3 @@
+function fullname = get_fullname_from_micrographid(this,micrographid)
+
+result = fetch(this.projectstruct.conn,['SELECT filename FROM micrographs WHERE micrograph_groups_micrographgroup_id = ' num2str(seriesid) ' AND projects_project_id = ' num2str(this.projectstruct.projectid)]);

@@ -1,0 +1,11 @@
+function this = savetodb(this)
+
+
+idx = find(this.particleid==-1);
+
+set(this.projectstruct.conn,'AutoCommit','off');
+
+fastinsert(projectstruct.conn,'micrographs'
+
+commit(this.projectstruct.conn);
+set(this.projectstruct.conn,'AutoCommit','on');

@@ -1,0 +1,8 @@
+function this = savetodb(this)
+
+settings = tom_HT_settings();
+
+
+mask = this;
+save([settings.data_basedir '/' handles.projectstruct.datadir '/masks/'],'mask');
+

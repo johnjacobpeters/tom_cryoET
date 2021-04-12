@@ -1,0 +1,18 @@
+# HyperSurface 0.1 ASCII
+# Created by Matlab and the TOM toolbox at: 27-Aug-2008 10:46:06
+Parameters {
+ Filename "simplex.surf"
+}
+Vertices 4
+ 0.000000 0.000000 0.000000 
+ 1.000000 0.000000 0.000000 
+ 1.000000 1.000000 0.000000 
+ 1.000000 1.000000 1.000000 
+Patches 1
+{
+Triangles 4
+ 1 2 3 
+ 1 2 4 
+ 1 3 4 
+ 2 3 4 
+}

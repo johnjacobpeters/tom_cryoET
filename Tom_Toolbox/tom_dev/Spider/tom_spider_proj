@@ -1,0 +1,17 @@
+function tom_spider_proj(workdir, modelfile, refanglesfile)
+
+fid = fopen([workdir '/create_projections.bat'],'wt');
+h = tom_readspiderheader(modelfile);
+
+fprintf(fid,'MD\nTR OFF\nMD\nVB OFF\n\n');
+fprintf(fid,'MD\nSET MP\n0\n\n');
+
+fprintf(fid,'PJ 3Q\n');
+fprintf(fid,[modelfile '\n']);
+fprintf(fid,[num2str(h.Header.Size(1)) '\n']);
+fprintf(fid,['(1-' num2str(numang) ')\n']);
+fprintf(fid,['logs/refangles' num2str(iter) '\n']);
+fprintf(fid,['stacks/references' num2str(iter) '@*****\n\n']);
+fprintf(fid,'en\n');
+
+fclose(fid);

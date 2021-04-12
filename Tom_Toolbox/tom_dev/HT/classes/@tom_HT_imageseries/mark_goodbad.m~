@@ -1,0 +1,27 @@
+function this = mark_goodbad(this,micrographid,data,redrawflag,r,c)
+
+if nargin < 4
+    redrawflag = false;
+end
+
+idx = find(this.micrographids == micrographid);
+
+if ischar(data) && strcmp(data,'toggle') == 1
+    if this.goodbad(idx) == true
+        data = false;
+    else
+        data = true;
+    end
+end
+    
+this.goodbad(idx) = data;
+
+if redrawflag == true 
+        set(this.figurehandle,'CurrentAxes',this.axeshandles(r,c));
+        if data(r,c) == true
+            delete(this.markhandles(r,c));
+            this.markhandles(r,c)= 
+        else
+            this.markhandles(r,c) = drawcross(width);
+        end
+end

@@ -1,0 +1,64 @@
+function success=tom_submit_to_hpcl_queue(settings)
+    hpcl = findResource('scheduler', 'type', 'generic:SGE');
+    hpcl.DataLocation = [settings.work_directory_path '/Hpcl_Log'];
+    hpcl.SubmitFcn = @tom_hpcl_submitfcn;
+    hpcl.ParallelSubmitFcn = @tom_hpcl_submitfcn;
+    hpcl.ClusterMatlabRoot = '/raid5/apps/MATLAB/';
+    find3d_job=hpcl.createMatlabPoolJob('MaximumNumberOfWorkers',settings.nr_of_nodes,'MinimumNumberOfWorkers',settings.nr_of_nodes);
+    [w]=which('tom_submit_to_hpcl_queue.m');
+    [tom_path]=fileparts(w);
+    find3d_job.PathDependencies={...
+        settings.work_directory_path; ...
+        find3d_path; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Analysis'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Classify'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Display'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Filtrans'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Geom'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/IOfun'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Misc'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Parallel'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Reconstruction'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Spider'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Sptrans'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/Util'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/av2'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/av3'; ...
+        '/fs/pool/pool-bmsan-apps/tom_dev/xmipp'};
+    
+    if settings.resume_flag==0
+        find3d_job.createTask('call_script',1);
+    else
+        find3d_job.createTask(['call_script_resume_nr_' num2str(settings.resume_brick_nr)],1);
+    end
+    msg='submit find3d job to hpcl queue.';
+    update_logfile(logfile_name,msg,settings.debug_flag);
+    find3d_job.submit;
+    OK=waitForState(find3d_job,'queued',60);
+    if OK==1
+        msg='find3d job queued.';
+        success=1;
+    else
+        msg='find3d job not queued.';
+        success=0;
+    end;
+    update_logfile(logfile_name,msg,settings.debug_flag);
+    if OK==1
+        [n msg]=unix('qstat');
+        update_logfile(logfile_name,msg,settings.debug_flag);
+    end
+    %    out = getAllOutputArguments(find3d_job);
+end;
+
+
+
+function update_logfile(logfile_name,msg,console_flag)
+
+% helper function for writing the logfile
+fid=fopen(logfile_name,'a+');
+fprintf(fid,'%s\r\n',[datestr(now) ': ' msg]);
+fclose(fid);
+if console_flag==1
+    disp(msg);
+end;

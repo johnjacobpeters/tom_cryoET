@@ -1,0 +1,11 @@
+function tom_av2_align_hightolow_check(text_file)
+
+
+st=importdata(text_file);
+
+for i=1:size(st,2)
+    shift=st.data(i,1:2);
+    filename_high=
+    filename_low=
+    
+end;

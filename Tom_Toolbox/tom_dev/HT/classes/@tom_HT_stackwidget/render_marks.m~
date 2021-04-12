@@ -1,0 +1,26 @@
+function this = render_marks(this,data)
+
+[this, width, height] = get_partsize(this);
+
+for c = 1:this.cols
+    for r = 1:this.rows
+        set(this.figurehandle,'CurrentAxes',this.axeshandles(r,c));
+        if data(r,c) == true
+            this.markhandles(r,c) = drawcross(width);
+        else
+            this.markhandles(r,c) = drawcross(width);
+        end
+    end
+end
+
+
+
+function h = drawcross(width)
+
+length = width.*.8;
+middle = width./2+1;
+%h = line([0 width 0 -width 0 width 0 -width],[0 -width 0 width 0 width 0 -width],'Marker','.','LineWidth',2,'Color',[1 0 0]);
+h = line([])
+
+
+

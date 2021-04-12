@@ -1,0 +1,17 @@
+function this = tom_HT_mask(sizex,sizey)
+
+this.size.x = sizex;
+this.size.y = sizey;
+this.name = '';
+this.description = '';
+this.mask = ones(sizex,sizey,'single');
+this.maskid = 0;
+this.params = struct();
+this = class(this,'tom_HT_mask');
+
+
+%params(i).name = [circle,rectangle,polygon,freehand,magic wand]
+%params(i).vals = 
+%                   circle: centerx,centery,radius,sigma
+%                   rectangle: leftupperx, leftuppery,width,height
+%                   polygon:   

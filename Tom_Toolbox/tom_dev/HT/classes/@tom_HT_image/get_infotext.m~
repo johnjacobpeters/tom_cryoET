@@ -1,0 +1,11 @@
+function infotext = get_infotext(this)
+
+if isempty(this.stat)
+    this = calcstats(this);
+end
+
+infotext{1} = ['Microscope: ' this.header.Microscope{1}];
+infotext{2} = ['Voltage: ' num2str(this.header.Voltage)./1000 ' kV'];
+infotext{3} = ['Objectpixelsize: ' num2str(this.header.Objectpixelsize./10) ' nm'];
+infotext{4} = ['intended defocus:' num2str(this.header.Defocus./10000) ' \mu m'];
+infotext{5} = ['[min max mean std var] : [' num2str(this.stat.min) ' ' num2str(this.stat.max) ' ' num2str(round(this.stat.mean)) ' ' num2str(round(this.stat.std) ' ' num2str(this.stat.variance) ']'];

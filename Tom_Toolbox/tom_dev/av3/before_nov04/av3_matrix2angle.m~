@@ -1,0 +1,15 @@
+function [psi phi theta] = av3_matrix2angle(matr)
+%
+%   [psi phi theta] = av3_matrix2angle(matr)
+%
+zz = matr(3,3);
+theta = acos(zz);
+yz = matr(3,2);
+zy = matr(2,3);
+if sin(theta) ~=0
+    cosphi = yz/sin(theta);
+    phi = acos(cosphi);
+    cospsi = 
+else
+    
+end;

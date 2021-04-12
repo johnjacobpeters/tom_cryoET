@@ -1,0 +1,183 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>tom_volume2PointCloud</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-03-06"><meta name="DC.source" content="tom_volume2PointCloud.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> cloud=tom_volume2PointCloud(vol,thr,samp)
+<span class="comment">%tom_volume2PointCloud transform a volume in a pointcloud (set of coordinates)</span>
+<span class="comment">%</span>
+<span class="comment">%    cloud=tom_volume2PointCloud(vol,thr,samp)</span>
+<span class="comment">%</span>
+<span class="comment">%PARAMETERS</span>
+<span class="comment">%</span>
+<span class="comment">%  INPUT</span>
+<span class="comment">%   vol                    path of the volumes</span>
+<span class="comment">%   thr                    threshold</span>
+<span class="comment">%   samp                   sampling of binarized vol 4 final pointcloud</span>
+<span class="comment">%</span>
+<span class="comment">%  OUTPUT</span>
+<span class="comment">%   cloud                  matrix of x y z coordinates</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%EXAMPLE</span>
+<span class="comment">%</span>
+<span class="comment">% cloud=tom_volume2PointCloud(tom_spheremask(ones(64,64,64)),0.9,4);</span>
+<span class="comment">%</span>
+<span class="comment">%REFERENCES</span>
+<span class="comment">%</span>
+<span class="comment">%SEE ALSO</span>
+<span class="comment">%</span>
+<span class="comment">%  tom_align_pointcloud</span>
+<span class="comment">%</span>
+<span class="comment">%   created by FB 01/24/12</span>
+<span class="comment">%</span>
+<span class="comment">%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',</span>
+<span class="comment">%   Journal of Structural Biology, 149 (2005), 227-234.</span>
+<span class="comment">%</span>
+<span class="comment">%   Copyright (c) 2004-2007</span>
+<span class="comment">%   TOM toolbox for Electron Tomography</span>
+<span class="comment">%   Max-Planck-Institute of Biochemistry</span>
+<span class="comment">%   Dept. Molecular Structural Biology</span>
+<span class="comment">%   82152 Martinsried, Germany</span>
+<span class="comment">%   http://www.biochem.mpg.de/tom</span>
+
+
+mask=vol&gt;thr;
+
+cloud=zeros((size(vol,1)*size(vol,2)*size(vol,3))./(samp.^3),3);
+zz=0;
+<span class="keyword">for</span> ix=1:samp:size(vol,1)
+    <span class="keyword">for</span> iy=1:samp:size(vol,2)
+        <span class="keyword">for</span> iz=1:samp:size(vol,3)
+            <span class="keyword">if</span> (mask(ix,iy,iz) &gt; 0 )
+
+                zz=zz+1;
+            <span class="keyword">end</span>;
+        <span class="keyword">end</span>;
+    <span class="keyword">end</span>;
+<span class="keyword">end</span>;
+
+disp(<span class="string">' '</span>);
+</pre><pre class="codeoutput">Error using tom_volume2PointCloud (line 40)
+Not enough input arguments.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+function cloud=tom_volume2PointCloud(vol,thr,samp)
+%tom_volume2PointCloud transform a volume in a pointcloud (set of coordinates)
+%
+%    cloud=tom_volume2PointCloud(vol,thr,samp)
+%
+%PARAMETERS
+%
+%  INPUT
+%   vol                    path of the volumes
+%   thr                    threshold
+%   samp                   sampling of binarized vol 4 final pointcloud
+%
+%  OUTPUT
+%   cloud                  matrix of x y z coordinates
+%
+%
+%EXAMPLE
+%
+% cloud=tom_volume2PointCloud(tom_spheremask(ones(64,64,64)),0.9,4);
+%
+%REFERENCES
+%
+%SEE ALSO
+%   
+%  tom_align_pointcloud
+%
+%   created by FB 01/24/12
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2007
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+
+mask=vol>thr;
+
+cloud=zeros((size(vol,1)*size(vol,2)*size(vol,3))./(samp.^3),3);
+zz=0;
+for ix=1:samp:size(vol,1)
+    for iy=1:samp:size(vol,2)
+        for iz=1:samp:size(vol,3)
+            if (mask(ix,iy,iz) > 0 )
+                
+                zz=zz+1;
+            end;
+        end;
+    end;
+end;
+
+disp(' ');
+
+
+##### SOURCE END #####
+--></body></html>

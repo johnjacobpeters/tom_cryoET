@@ -1,0 +1,43 @@
+function [result quality]=tom_check_image_quality(in,EM,Search)
+
+% power spectrum, log!
+ps=tom_calc_periodogram_parallel(single(in.Value),256,0,floor(256./16));
+ps=(log(fftshift(ps)));
+
+% correct PS for background
+correctbackground_inner_radius=4;
+correctbackground_outer_radius=64;
+[decay decay_image]=calc_decay(ps,correctbackground_inner_radius,correctbackground_outer_radius,32);
+background_corrected_ps=double(ps-decay_image);
+
+% mask PS
+img_size=size(background_corrected_ps);
+mask_in_radius=5;
+mask_out_radius=32;
+mask_in = tom_spheremask(ones(img_size),mask_in_radius,0,[img_size(1)./2+1 img_size(2)./2+1 1]);
+mask_out = tom_spheremask(ones(img_size),mask_out_radius,0,[img_size(1)./2+1 img_size(2)./2+1 1]);
+mask=mask_out-mask_in;
+background_corrected_masked_ps=background_corrected_ps.*mask;
+
+% adapt defocus search range
+dz=img_1.Header.Defocus.*(1e-10)
+Search
+
+[Fit]=tom_fit_ctf(background_corrected_masked_ps,EM,Search);
+quality.ps=background_corrected_masked_ps;
+quality.Fit=Fit;
+sz=size(quality.Fit.corr_all);
+r=reshape(quality.Fit.corr_all,[sz(1).*sz(2).*sz(3).*sz(4) 1]);
+quality.test.ccc_min=min(r);
+quality.test.ccc_max=max(r);
+quality.test.ccc_mean=mean(r);
+quality.test.ccc_std=std(r);
+quality.test.confidence=(quality.test.ccc_max-quality.test.ccc_mean)./quality.test.ccc_std;
+if quality.test.confidence>1.5 && quality.test.ccc_max>0.1
+    quality.result=1;
+    result=1;
+else
+    quality.result=0;
+    result=0;
+end;
+

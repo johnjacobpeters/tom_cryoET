@@ -1,0 +1,51 @@
+function image = av3_bandpass(image,low,hi,smooth)
+%TOM_BANDPASS performs bandpass filtering of image or volume
+%   image = tom_bandpass(image,low,hi,smooth)
+%   
+%PARAMETERS 
+%  IN
+%   image         iamge or volume to be filtered
+%   low           lowest frequ (in pixels)
+%   hi            highest frequ
+%   smooth        smoothing (optional) - if low = 1 no smoothing around
+%                   zero frequency
+%
+%  OUT
+%   image         filtered image or volume
+%
+%SEE ALSO
+%   TOM_FILTER
+%
+%    Copyright (c) 2004
+%    TOM toolbox for Electron Tomography
+%    Max-Planck-Institute for Biochemistry
+%    Dept. Molecular Structural Biology
+%    82152 Martinsried, Germany
+%    http://www.biochem.mpg.de/tom
+%
+%   02/14/03 FF
+%  last change 08/06/04 FF
+error(nargchk(3,4,nargin));
+scf = 1/(size(image,1)*size(image,2)*size(image,3));
+[x,y,z]=ndgrid( -1:1/(floor(size(image,1)/2)):(size(image,1)-1)*1/(floor(size(image,1)/2))-1,...
+    -1:1/(floor(size(image,2)/2)):(size(image,2)-1)*1/(floor(size(image,2)/2))-1,...
+    -1:1/(floor(size(image,3)/2)):(size(image,3)-1)*1/(floor(size(image,3)/2))-1);
+
+if nargin<4 % fast version
+    [x,y,z]=ndgrid( -floor(size(image,1)/2):-floor(size(image,1)/2)+(size(image,1)-1),...
+        -floor(size(image,2)/2):-floor(size(image,2)/2)+size(image,2)-1, ...
+        -floor(size(image,3)/2):-floor(size(image,3)/2)+size(image,3)-1);
+    len = sqrt(x.^2 +y.^2+z.^2);clear y; clear z;clear x;
+    lowp = len <= hi;
+    highp=len >= low;
+    image = fftshift(tom_fourier(image));
+    image = scf*real(tom_ifourier(ifftshift(highp.*lowp.*image)));
+else % smoothened version
+    image = fftshift(tom_fourier(image));
+    if low > 0
+        image= scf*real(tom_ifourier(ifftshift(tom_spheremask(image,hi,smooth) - tom_spheremask(image,low,smooth))));
+    else
+        image= scf*real(tom_ifourier(ifftshift(tom_spheremask(image,hi,smooth))));
+    end;
+end;
+    

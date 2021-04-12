@@ -1,0 +1,40 @@
+function out=tom_isxmippsell(filename)
+
+flag=1;
+
+[path name ext]=fileparts(filename);
+
+if (strcmp(ext,'.sel')==0)
+    out=0;
+    return;
+end;
+
+if (fid==-1)
+    out=0;
+    return;
+end;
+
+
+fid=fopen(filename);
+line=fgetl(fid);
+fclose(fid);
+
+try 
+    
+    flag=1;
+catch
+
+end;
+ 
+
+try
+
+    flag=2;    
+catch
+
+end;
+
+
+out=1;
+
+

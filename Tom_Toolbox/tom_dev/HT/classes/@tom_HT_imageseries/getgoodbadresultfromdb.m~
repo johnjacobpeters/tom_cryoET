@@ -1,0 +1,15 @@
+function this = getgoodbadresultfromdb(this,resultname)
+
+setdbprefs('DataReturnFormat','numeric');
+expid = fetch(this.projectstruct.conn,['SELECT experiment_id FROM experiment WHERE name = ''' resultname '''']);
+ setdbprefs('DataReturnFormat','structure');
+
+if ~isempty(expid)
+    this.resultid = expid(1);
+end
+this.resultname = resultname;
+
+if this.resultid ~= 0
+    this.goodbad = fetch(this.projectstruct.conn,['SELECT ris.goodbad FROM res_imageseriessort ris JOIN (results r,experiment e) ON (ris.results_result_id= r.result_id AND r.experiment_id=e.experiment_id) WHERE r.result_id = ' num2str(this.resultid)]);
+end
+

@@ -1,0 +1,43 @@
+function [noiseVolume noisyVolume]= tom_os3_generateNoise(volume,noiseType,SNR,volumeMean,volumeSTD,mask)
+% volume = the volume
+% noisetype = additive | multiplicative(not jet)
+% SNR iterator
+% volumeMean - mean of the real signal (either all values ~= 0 or all values under a mask)
+% volumeSTD - std of the real signal (same)
+
+if(~exist('mask'))
+    mask = ones(size(volume),'single');
+end;
+volumeSize = size(volume);
+% volumeMean = mean(volume(find(volume ~= 0)));
+
+
+if(strcmp(noiseType,'additive'))
+    
+    if(SNR == 0)
+        error('Using SNR 0 is not possible');
+    end;
+    
+    if(nargin <= 3)
+        volumeMean= mean(volume(:));
+        volumeSTD = std(volume(:));
+    end;
+
+    
+    %SNR = varIMG/varNoise ->  varNoise = varIMG/SNR 
+    %according to penzec
+    varNoise = volumeSTD^2 / SNR;
+    
+    
+    noiseVolume= random('norm',volumeMean,sqrt(varNoise),volumeSize);
+    m = find(mask == 0);
+    mask(m) = 1;
+    noisyVolume= (volume+ noiseVolume.*mask)./mask;
+
+end;
+
+
+
+
+
+

@@ -1,0 +1,8 @@
+function [data struct_fieldnames]=tom_HT_struct2cell(struct)
+
+struct_fieldnames=fieldnames(struct);
+
+for i=1:length(struct_fieldnames)
+
+    data{i,:}=[ eval(['struct(:).' struct_fieldnames{i}]) ];
+end;

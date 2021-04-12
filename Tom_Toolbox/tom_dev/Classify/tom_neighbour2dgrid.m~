@@ -1,0 +1,40 @@
+function [nodes,direction] = tom_neighbour2dgrid(node,gridsize,grid_top)
+
+%1: hor
+%2: vert
+
+if nargin < 3
+    metric = 'rect';
+end
+
+if node > gridsize(1).*gridsize(2)
+    error('No such node.');
+end
+
+nodes = [];
+direction = [];
+
+
+if isequal(grid_top,'rect')
+    if mod(node,gridsize(1)) > 0
+        nodes = [nodes node + 1];
+        direction = [direction;-1 0];
+    end
+
+    if mod(node,gridsize(1)) ~= 1
+        nodes = [nodes node - 1];
+        direction = [direction;1 0];
+    end
+
+    if node < gridsize(1).*gridsize(2)-gridsize(1)
+        nodes = [nodes node + gridsize(1)];
+        direction = [direction; 0 1];
+    end
+
+    if node > gridsize(1)
+        nodes = [nodes node - gridsize(1)];
+        direction = [direction; 0 -1];
+    end
+end
+
+%direction=direction.*-1;

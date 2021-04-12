@@ -1,0 +1,10 @@
+function [micrograph] = getmicrograph(this,micrographid,statflag,outsize)
+
+if nargin < 4
+    outsize = [];
+end
+
+if nargin < 3
+    statflag = 0;
+end
+

@@ -1,0 +1,39 @@
+function result = tom_HT_classifyctfs(psd,masksize,masksize_outer,svmStruct)
+
+%dircell = tom_HT_getdircontents(directory,{'em'});
+
+%header = tom_reademheader([directory '/' dircell{1}]);
+
+mask  = tom_sphere([header.Header.Size(1),header.Header.Size(2)],masksize);
+mask = (mask==0);
+mask_outer  = tom_sphere([header.Header.Size(1),header.Header.Size(2)],masksize_outer);
+mask = mask.*mask_outer;
+
+result = zeros(length(dircell),1);
+%demoset = zeros(100,masksize_outer-masksize+1,'single');
+
+%load trainingset2.mat
+
+for i=1:length(dircell);
+    file = dircell{i};
+    ps = tom_emreadc([directory '/' file]);
+    ps = ps.Value.*mask;
+    ps = tom_cart2polar(ps);
+    ps = sum(ps,2)./(size(ps,2));
+    %ps = tom_bandpass(ps,5,50);
+    ps = tom_norm(ps','mean0+1std');
+    
+    %if i<101
+    %    demoset(i,:) = ps(masksize:masksize_outer);
+    %end
+    
+    result(i) = svmclassify(svmStruct, ps(masksize:masksize_outer));
+    %if result(i) == 1
+    %    align2d(i).quality = 10;
+    %else
+    %    align2d(i).quality = 0;
+    %end
+end
+
+%save('trainingset2.mat','align2d');
+%figure;tom_imagesc(demoset);

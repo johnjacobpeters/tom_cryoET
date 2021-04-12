@@ -1,0 +1,182 @@
+#!/usr/bin/perl -w
+
+
+use strict;
+use warnings;
+
+use IO::Socket;
+use IO::Handle;
+use Errno;
+#use Digest::MD5;
+
+
+my $serverport = shift @ARGV;
+defined $serverport or $serverport=21332;
+
+# Open socket.
+my $sock = new IO::Socket::INET(LocalHost => 'localhost',
+                                  LocalPort => $serverport,
+                                  Proto => 'tcp',
+                                  Listen => 1,
+                                  Reuse => 1,
+                                 );
+
+die "Could not create socket: $!\n" unless $sock;
+
+my %csocks;
+my ($csock);
+my $checklist_r;
+my $checklist_w;
+my $checklist_e;
+
+my $line;
+my $FNULL;
+
+open($FNULL, "> /dev/null");
+
+my %files;
+
+my $filename;
+
+
+my $cnt = 0;
+my $timeout;
+my $nexttimeout = 3600;
+my ($nfound,$timeleft);
+
+do {
+    $timeout = $nexttimeout;
+
+    $cnt++;
+    print(STDERR "===========================\n$cnt: SELECT (". keys(%csocks)." clients, " . keys(%files) . " files). Timeout in $timeout sec.\n");
+
+    # Create list with filehandles to check...
+    $checklist_r = $checklist_w = '';
+    vec($checklist_r, fileno($sock), 1) = 1;
+    for $csock (keys %csocks) {
+        vec($checklist_r, $csock, 1) = 1;
+    }
+    #$checklist_w = $checklist_r;
+    $checklist_e = $checklist_r | $checklist_w;
+
+    # SELECT: wait until there is some data available.
+    ($nfound,$timeleft) = select($checklist_r, $checklist_w, $checklist_e, $timeout);
+
+    if ($nfound < 0 ) {
+        # ERROR!
+        if ( $! == Errno::EINTR ) {
+            print(STDERR "SELECT: got signal $!.\n");
+        } else {
+            die("SELECT: $!\n");
+        }
+    } elsif ($nfound == 0) {
+        # Simple timeout.
+        print(STDERR "SELECT: timeout.\n");
+    } else {
+        # There is something to read/write.
+        print(STDERR "SELECT: $nfound handles active.\n");
+        if (vec($checklist_r, fileno($sock), 1)) {
+            # The server socket has a new connection available.
+            $csock = $sock->accept();
+            delete $csocks{$csock->fileno};
+            $csocks{$csock->fileno}{'socket'} = $csock;
+            print(STDERR "ACCEPT: new client #" . $csock->fileno . " connected...\n");
+        }
+
+        # Check the client sockets...
+        for $csock (keys %csocks) {
+            if (vec($checklist_r, $csock, 1)) {
+                print(STDERR "RECV FROM #$csock: ");
+                if (!defined($line = readline($csocks{$csock}{'socket'}))) {
+                    # Nothing read: Connection to client is closed.
+                    print(STDERR "close connection.\n");
+                    $csocks{$csock}{'socket'}->close();
+                    delete($csocks{$csock});
+                } else {
+                    # Parse the recived command.
+                    $line =~ s/\r?\n//;
+                    print(STDERR "read line \"$line\".\n");
+                    my (@cmd) = split(/\t/, $line);
+                    if (!defined($cmd[0])) {
+                    } elsif ($cmd[0] eq 'readf') {
+                        # Command readf...
+                        $filename = undef;
+                        my $delay = '60';
+                        my $nrepeat = '1';
+                        for (my($i)=1; $i<=$#cmd; $i++) {
+                            if ($cmd[$i] eq '-repeat') {
+                                $i++;
+                                if ($i > $#cmd || !($cmd[$i] =~ /^([0-9]+)((.)([0-9]+))?$/)) {
+                                    print(STDERR "    $csock:PARSE CMD \"$line\": option -repeat has parameter nrepeat[#sdelay].\n");
+                                } else {
+                                    $nrepeat = $1;
+                                    $delay = defined($4) ? $4 : '1';
+                                }
+                            } elsif (!defined($filename)) {
+                                $filename = $cmd[$i];
+                            } else {
+                                print(STDERR "    $csock:PARSE CMD \"$line\": unknown option $cmd[$i].\n");
+                            }
+                        }
+                        if (!defined($filename)) {
+                            print(STDERR "    $csock:PARSE CMD \"$line\": readfile needs filename as parameter.\n");
+                        } elsif (!(-r $filename && -f $filename)) {
+                            print(STDERR "    $csock:PARSE CMD \"$line\": file $filename is not readable or does not exist.\n");
+                        } else {
+                            $files{$filename} = { 'timeout' => 0,
+                                                  'nrepeat' => $nrepeat,
+                                                  'delay' => $delay };
+                        }
+                    } else {
+                        print(STDERR "    $csock: unknown command \"".$cmd[0]."\": IGNORE\n");
+                    }
+                }
+            }
+            if (vec($checklist_w, $csock, 1)) {
+                # Writing is not expected.
+                print(STDERR "$csock:ready for writing (NOT EXPECTED!)...\n");
+            }
+            if (vec($checklist_e, $csock, 1)) {
+                # Errors are not checked.
+                print(STDERR "$csock:error... (NOT EXPECTED!)\n");
+            }
+        }
+    }
+
+    # Check the list of files, if the have to be reread!
+    $timeleft = $timeout - $timeleft;
+    $nexttimeout = 3600;
+    for $filename (keys %files) {
+        print(STDERR "FILE $filename: nrep=$files{$filename}{'nrepeat'}; delay=$files{$filename}{'delay'}; tleft=$files{$filename}{'timeout'}-$timeleft; \n");
+        if (($files{$filename}{'timeout'} -= $timeleft) <= 0) {
+            if (($files{$filename}{'nrepeat'} -= 1) >= 0) {
+                $files{$filename}{'timeout'} = $files{$filename}{'delay'};
+
+                if (open(FILE, $filename)) {
+	 	    while (<FILE>) {
+		      ;
+		    }
+                    #binmode(FILE);
+                    #print(STDERR "     MD5: " . Digest::MD5->new->addfile(*FILE)->hexdigest . "\n");
+		    close(FILE);
+                } else {
+                    print(STDERR "     could not open (remove from list)\n");
+                    delete $files{$filename};
+                    next;
+                }
+            }
+            if ($files{$filename}{'nrepeat'} <= 0) {
+                print(STDERR "    finished! remove from list\n");
+                delete $files{$filename};
+                next;
+            }
+        }
+        print(STDERR "     $filename: nrep=$files{$filename}{'nrepeat'}; delay=$files{$filename}{'delay'}; tleft=$files{$filename}{'timeout'}; \n");
+        if ($nexttimeout > $files{$filename}{'timeout'}) {
+            $nexttimeout = $files{$filename}{'timeout'};
+        }
+    }
+
+} while (1);
+
+

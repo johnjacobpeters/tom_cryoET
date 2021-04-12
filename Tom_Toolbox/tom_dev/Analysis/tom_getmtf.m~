@@ -1,0 +1,18 @@
+function tom_getmtf(image)
+
+if ischar(filename)
+    try
+        im = tom_emreadc(filename,'binning',binning);
+    catch
+        error('Could not open file.');
+    end
+
+    lowcutoff = lowcutoff ./ 2^binning ./ (split./2);
+    
+    if filterval > 1
+        im.Value = tom_filter(im.Value,filterval,'quadr','real');
+    end
+
+    %calculate and integrate power spectrum
+    ps = tom_image2ctf(double(im.Value),1,0,split,0);
+end

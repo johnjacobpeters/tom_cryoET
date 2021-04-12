@@ -1,0 +1,28 @@
+function this = layout(this,width,height,rows,cols)
+
+if isempty(this.figurehandle)
+    this.figurehandle = figure('Units','pixels','Position',[50 50 width height+10],'Toolbar','none','Menubar','none');
+end
+
+this.rows = rows;
+this.cols = cols;
+
+axeswidth = floor(width ./ cols);
+axesheight = floor(height ./ rows);
+
+this.axeshandles = zeros(rows,cols);
+
+
+for c = 1:cols
+    for r = 1:rows
+        left = (c-1) .* axeswidth;
+        bottom = (rows - r) .* axesheight;
+        this.axeshandles(r,c) = axes('Units','pixels','Position',[left bottom axeswidth axesheight]);
+        axis off;
+        axis image;
+    end
+end
+
+
+
+this.imagehandles = zeros(this.rows,this.cols);

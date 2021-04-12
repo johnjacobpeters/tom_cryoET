@@ -1,0 +1,96 @@
+function tom_classify(stack_in,output_dir,align_st,align_out,pre_processing,classifyer,cut,Filter,Mask,Norm)
+%
+%
+%
+%
+%
+h=tom_reademheader(stack_in);
+sz_org=h.Header.Size;
+
+
+%parse inputs
+if (isempty(align_st)==1)
+    align_st(1,1).auto_class=-1;
+end;
+
+%transfer often used
+iter_num=size(align_st,2);
+num_of_classes=classifyer.num_of_classes;
+
+
+tom_build_classify_file_struct(output_dir,iter_num,num_of_classes);
+tom_reshape_stack(stack_in,[output_dir '/r_stack'],1);
+
+%preprocessing
+if isempty(pre_processing)==0
+    if (strcmp(pre_processing.Type,'pca'))
+      %all in memory so far ...to be done in packages and paraell
+      st=tom_emread([output_dir '/r_stack']); 
+      [coefs,scores,variances,t2] = princomp(st.Value);
+      sc_tmp=scores(:,1:pre_processing.num_of_eigenvectors);
+      tom_emwrite([output_dir '/r_stack'],sc_tmp);  
+    end;
+end;
+
+
+%classifying
+if (strcmp(classifyer.Type,'k-means')==1)
+    
+    %to be replaced by a paraell approach
+    st=tom_emread([output_dir '/r_stack']);
+    st=st.Value;
+   
+    [classes] = kmeans(st,num_of_classes);
+   
+    %initialize allocate some space on HD! 
+    num=get_class_numbers(classes,num_of_classes);
+    class_count=zeros(num_of_classes,1);
+    avg=zeros(sz_org(1),sz_org(2),num_of_classes);
+    for i=1:num_of_classes
+        dir_out=[output_dir '/run_' num2str(iter_num) '/class_' num2str(i) '/stack' ];  
+        tom_emwritec(dir_out,[sz_org(1) sz_org(2) num(i)],'new');
+    end;
+    
+    
+    %bookkepping
+    for i=1:size(classes,1)
+        im=tom_emread([stack_in],'subregion',[1 1 i],[sz_org(1)-1 sz_org(2)-1 0]);
+        im=im.Value;
+        %update align struct 
+        class_count(classes(i))=class_count(classes(i))+1;
+        align_st(iter_num,i).auto_class=classes(i);
+        dir_out=[output_dir '/run_' num2str(iter_num) '/class_' num2str(classes(i)) '/stack' ];
+        tom_emwritec(dir_out,im,'subregion',[1 1 class_count(classes(i))],[sz_org(1) sz_org(1) 1]);
+        avg(:,:,classes(i))=avg(:,:,classes(i))+im;
+    end;
+    
+    
+    for i=1:num_of_classes
+        dir_out=[output_dir '/run_' num2str(iter_num) '/class_' num2str(i) '/avg.em' ];
+        tom_emwrite(dir_out,avg(:,:,i));
+    end;
+    
+    
+  
+
+end;
+
+
+%validation
+
+
+function num=get_class_numbers(classes,num_of_classes)
+
+num=zeros(num_of_classes,1);
+
+for i=1:size(classes,1)
+        ref_nr=classes(i);
+        num(ref_nr)=num(ref_nr)+1;
+end;
+
+
+
+
+
+
+

@@ -1,0 +1,31 @@
+function tom_purgequeue(jobmanagername)
+% purge a jobmanager queue
+%
+%SYNTAX
+% tom_purgequeue(jobmanagername)
+%
+% INPUT
+% jobmanagername:   name of the jobmanager
+%
+%Copyright (c) 2006
+%TOM toolbox for Electron Tomography
+%Max-Planck-Institute for Biochemistry
+%Dept. Molecular Structural Biology
+%82152 Martinsried, Germany
+%http://www.biochem.mpg.de/tom
+%
+%Created: 25/01/06 AK
+
+try
+    jm = findResource('jobmanager','name',jobmanagername);
+catch
+    error
+finished_jobs = findJob(jm);
+if (isempty(finished_jobs)==1)
+   disp('Queue is already purged.'); 
+   return;
+end;
+cancel(finished_jobs);
+destroy(finished_jobs);
+
+disp('Queue purge completed.');

@@ -1,0 +1,19 @@
+function conn = tom_HT_opendb()
+
+warning off;
+    tom_HT_addjavapath();
+warning on;
+
+settings = tom_HT_settings();
+logintimeout(settings.db.driver, settings.db.logintimeout); 
+conn = database('HT',settings.db.username,settings.db.password,settings.db.driver,settings.db.url);
+
+if ~isempty(conn.Message)
+    error(['Cannot connect to database: ' conn.Message]);
+end
+
+if isconnection(conn) == 0
+    error('Cannot connect to database');
+end
+
+setdbprefs('DataReturnFormat','structure','ErrorHandling','report')

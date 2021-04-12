@@ -1,0 +1,32 @@
+function tom_build_classify_file_struct(basedir,run,num_of_classes,dim_flag)
+
+
+if (isunix==1)
+    if (exist([basedir '/run_' num2str(run)],'dir')==0)  
+        mkdir([basedir '/run_' num2str(run)]);
+    end;
+else
+    if (exist([basedir '\run_' num2str(run)],'dir')==0)  
+        mkdir([basedir '\run_' num2str(run)]);
+    end;
+
+end;
+
+for i=1:num_of_classes
+    
+    if (isunix==1)
+         if (exist([basedir '/run_' num2str(run) '/class_' num2str(i) ],'dir')==0)
+            mkdir([basedir '/run_' num2str(run) '/class_' num2str(i) ]);
+        end;  
+    else
+        if (exist([basedir '\run_' num2str(run) '\class_' num2str(i) ],'dir')==0)
+            mkdir([basedir '\run_' num2str(run) '\class_' num2str(i) ]);
+        end;
+    end;
+
+end;
+
+if (strcmp(dim_flag,'3d')==1)
+    mkdir([basedir '\run_' num2str(run) '\avg
+    
+end;

@@ -1,0 +1,14 @@
+function this = get_micrographs_from_imageseries(this,seriesid)
+
+
+if ischar(seriesid)
+    result = tom_HT_getimageseriesid_from_name(projectstruct,seriesid);
+    seriesid = result.micrographgroup_id;
+end
+
+this.filenames = fetch(projectstruct.conn,['SELECT filename FROM micrographs WHERE micrograph_groups_micrographgroup_id = ' num2str(seriesid) ' AND projects_project_id = ' num2str(projectstruct.projectid)]);
+
+
+settings = tom_HT_settings();
+
+this.fullfilenames = cellfun(@strcat(settings.data_basedir '/' this.projectstruct.projectname '/micrographs/' x),this.filenames);

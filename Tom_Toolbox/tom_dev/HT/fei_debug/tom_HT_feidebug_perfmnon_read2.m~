@@ -1,0 +1,151 @@
+function st_out=tom_HT_feidebug_perfmnon_read2(filename,flag,replace_val)
+%TOM_HT_FEIDEBUG_PERFMON_READ2 reads a microsoft perfmon file text file
+%
+%   st_out=tom_HT_feidebug_perfmnon_read2(filename,flag,replace_val)
+%
+%PARAMETERS
+%
+%  INPUT
+%   filename            filename
+%   flag                flag for replacing non numeric Values ('nearest' or
+%                       'replace_by') n       
+%   sigma               smoothing of mask; if entered mask will be smoothened;
+%                       every voxel outside radius gets smoothened by a gaussian
+%   center              vector determining center of sphere
+%  
+%  OUTPUT
+%   vol                 masked volume
+%
+%EXAMPLE
+%   xxx= ones(64,64);
+%   yyy = tom_spheremask(xxx,4,10,[16 16 1]);
+%   imagesc(yyy);
+%
+%REFERENCES
+%
+%SEE ALSO
+%   ...
+%
+%   created by FF 08/14/02
+%   updated by FF25/03/04
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2007
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+
+if nargin < 2
+    flag='nearest';
+end;
+
+if nargin < 3
+    replace_val=NaN;
+end;
+
+ss=importdata(filename);
+
+line=ss{1,:};
+rest=line;
+for i=1:1000
+   [val rest]=strtok(rest,'"');
+    titles{i}=val;
+   [val rest]=strtok(rest,'"');
+   if (isempty(rest))
+        break;
+   end;
+end;
+
+errorcount=0;
+error_per_coumn=zeros(size(titles,2),1);
+
+for ii=2:size(ss,1)
+    line=ss{ii,:};
+    rest=line;
+    for i=1:1000
+        [val rest]=strtok(rest,'"');
+        if i==1
+            st_out.dates{ii-1}=val;
+        else
+            if ~isnan(str2double(val))
+                st_out.data(ii-1,i-1)=str2num(val);
+            else
+                if strcmp(flag,'nearest')==1
+                    st_out.data(ii-1,i-1)=find_next_value(ss,ii,i);
+                end;
+                if strcmp(flag,'replace_by')==1
+                    st_out.data(ii-1,i-1)=replace_val;
+                end;
+                errorcount=errorcount+1;
+                error_per_coumn(i-1)=error_per_coumn(i-1)+1;
+            end;
+        end;
+        [val rest]=strtok(rest,'"');
+        if (isempty(rest))
+            break;
+        end;
+    end;
+end;
+
+
+st_out.titles=titles;
+st_out.error_per_coumn=error_per_coumn';
+st_out.total_error=errorcount;
+
+disp(['Warning: data ' num2str(errorcount) ' times not numeric!'] );
+disp('Replaced by nearest neighbour');
+
+disp('');
+
+
+function val=find_next_value(data,ii,count)
+
+disp('');
+
+if ii > 2
+    line=data{ii-1,:};
+    rest=line;
+    for i=1:1000
+        [val rest]=strtok(rest,'"');
+        [vall rest]=strtok(rest,'"');
+        if (i==count)
+            break;
+        end;
+    end;
+     if ~isnan(str2double(val))
+        val=str2num(val);
+        return;
+    end;
+end;
+
+
+if ii < size(data,1)-1
+    line=data{ii+1,:};
+    rest=line;
+    for i=1:1000
+        [val rest]=strtok(rest,'"');
+        [vall rest]=strtok(rest,'"');
+        if (i==count)
+            break;
+        end;
+    end;
+    if  ~isnan(str2double(val))
+        val=str2num(val);
+        return;
+    end;
+end;
+
+val=0;
+
+
+
+
+
+
+
+

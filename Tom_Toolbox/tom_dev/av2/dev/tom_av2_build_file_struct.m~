@@ -1,0 +1,28 @@
+function tom_av2_build_file_struct(flag)
+
+
+if nargin==0
+    flag='';
+end;
+
+%rock the struct
+
+mkdir align;
+    mkdir align/high/;
+        mkdir align/high/whole_particle/;
+        mkdir align/high/core/;
+    mkdir align/low/;
+        mkdir align/low/whole_particle/;
+        mkdir align/low/core/;
+
+mkdir pick;
+    mkdir pick/high/;
+    mkdir pick/low/;
+        
+mkdir org;
+    
+mkdir sort;
+
+mkdir rec;
+
+mkdir obsolete;

@@ -1,0 +1,165 @@
+;definition of variables
+
+[num_iterations] = 15  ;number of refinement iterations
+[delta_theta] = 10     ;angular increment
+[theta_start] = 0      ;theta start (deg) default: 0
+[theta_stop] = 90      ;theta stop  (deg) default: 90
+[phi_start] = 0        ;phi start   (deg) default: 0
+[phi_stop] = 359.9     ;phi stop    (deg) default: 359.9
+[restrict] = 0         ;restrict angular search (deg) default: 0
+[apply_symmetry] = 0   ;apply symmetry 0: do not apply, 1: apply
+
+[maxshift] = 5         ;maximum translational shift during particle alignment (pixels), default: 5
+[ringstop] = 32       ;ring stop 
+
+
+
+MD
+TR OFF
+MD
+VB OFF
+
+; get particle dimensions
+
+FI [imdim],[numparticles]
+stacks/stack
+2,24
+
+; create symmetry file
+IF ([apply_symmetry].EQ.1) THEN
+SY
+sym
+C
+2
+ENDIF
+
+DO  [iter] = 1,20
+
+; create angles file
+VO EA [numangles]
+[delta_theta]
+([theta_start],[theta_stop])
+([phi_start] ,[phi_stop])
+logs/refangles1{***[iter]}
+
+; create references
+PJ 3Q
+3D/model{***[iter}
+[imdim]
+(1-[numangles])
+logs/refangles1{***[iter]}
+stacks/references{***[iter]}@*****
+
+; find aligmnent
+IF ([restrict].EQ.0) THEN           ; no search restriction
+
+AP SH
+stacks/references{***[iter]}@*****
+(1-[numangles])
+([maxshift],1)
+(1,[ringstop])
+logs/refangles1{***[iter]}
+stacks/stack@*******
+(1,[numparticles])
+*
+(0)
+(1)
+logs/alignmentparams{***[iter]}
+
+ELSEIF ([iter].EQ.1) THEN            ; first iteration, therefore no search restriction
+
+AP SH
+stacks/references{***[iter]}@*****
+(1-[numangles])
+([maxshift],1)
+(1,[ringstop])
+logs/refangles1{***[iter]}
+stacks/stack@*******
+(1,[numparticles])
+*
+(0)
+(1)
+logs/alignmentparams{***[iter]}
+
+
+ELSE				; search restriction
+[iterbefore] = [iter]-1
+
+AP SH
+stacks/references{***[iter]}@*****
+(1-[numangles])
+([maxshift],1)
+(1,[ringstop])
+logs/refangles1{***[iter]}
+stacks/stack_aligned{***[iterbefore]}@*******
+(1,[numparticles])
+logs/alignmentparams{***[iter]}
+([restrict],0)
+(1)
+logs/alignmentparams{***[iter]}
+
+ENDIF
+
+; align particles
+
+DO [iter2]=1,[numparticles]
+UD IC [iter2],[dummy],[dummy],[dummy],[dummy],[dummy],[ROT],[SX],[SY]
+logs/alignmentparams{***[iter]}
+
+RT SQ
+stacks/stack@{*******[iter2]}
+stacks/stack_aligned{***[iter]}@{*******[iter2]}
+([ROT],1.0)
+([SX],[SY])
+ENDDO
+
+UD ICE
+logs/alignmentparams{***[iter]}
+
+; backprojection of new model
+IF ([apply_symmetry].EQ.0)
+
+BP 32F
+stacks/stack_aligned{***[iter]}@*******
+(1-[numparticles])
+logs/alignmentparams{***[iter]}
+*
+3D/model
+3D/model_half1{***[iter]}
+3D/model_half2{***[iter]}
+
+ELSE
+
+BP 32F
+stacks/stack_aligned{***[iter]}@*******
+(1-[numparticles])
+logs/alignmentparams{***[iter]}
+sym
+3D/model
+3D/model_half1{***[iter]}
+3D/model_half2{***[iter]}
+
+ENDIF
+
+;determine resolution
+RF 3 [cutoff_pixel],[cutoff_freq]
+3D/model_half1{***[iter]}
+3D/model_half2{***[iter]}
+1
+(0.6,1.2)
+90.0
+3.0
+logs/fsc{***[iter]}
+
+;filter volume according to cutoff
+[low] = [cutoff_pixel] - 0.05
+[low] = [cutoff_pixel] + 0.05
+FQ
+3D/model_unfiltered{***[iter}
+3D/model{***[iter]}
+7
+[low]
+[high]
+
+
+ENDDO

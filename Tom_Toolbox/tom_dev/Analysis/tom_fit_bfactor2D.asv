@@ -1,0 +1,145 @@
+function [bfactor]=tom_fit_bfactor2D(in, objectpixelsize, fit_range,ps_size,info_flag)
+
+% [bfactor ]=tom_fit_bfactor2D(in, objectpixelsize, fit_range, info_flag)
+%
+% Input:
+%           in:                         input 3D volume.
+%           objectpixelsize:            objectpixelsize in Angstrom
+%           fit_range:                  fit range for bfactor determination in Angstrom.
+%           info_flag:                  verbose flag, show Guinier graph and fit.
+% Output:
+%           bfactor:                    determined Bfactor in 1/(A^2).
+%           decay_restore:              restored decay function.
+% 
+% Example:
+%
+%
+%
+%SEE ALSO
+%   tom_fit_bfactor
+%
+%   created by SN 02/16/11
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2010
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+if nargin<4
+    info_flag=0;
+end;
+if info_flag==1
+disp(['------------------------------------------------------------------------------------']);
+disp(['EM density with:']);
+disp(['Objectpixelsize: ' num2str(objectpixelsize) ' Angstrom.']);
+disp(['Bfactor Fit Range: ' num2str(fit_range(1)) ' nm to ' num2str(fit_range(2)) ' nm.']);
+disp('calculate Guinier graph and fit line ...');
+end;
+
+bfactor=0;
+corrected=0;
+fit_range_pixel=(2.*objectpixelsize./fit_range).*size(in,1)./2;
+sz=size(in,1);
+sz_2=size(in,1)./2;
+ps=tom_calc_periodogram_parallel(single(in),ps_size,0,floor(ps_size./16));
+lln=calc_fourier_shell(sqrt(ps));
+
+lln=lln./max(lln);
+
+decay=log(lln)';
+
+x=(2*objectpixelsize.*length(decay))./([1:1:length(decay)]);
+x_plot=[1:1:length(decay)];
+
+idx=1;
+for i=1:length(decay)
+    if x(i)>=fit_range(1) && x(i)<=fit_range(2)
+    decay_area(idx)=decay(i);
+    x_area(idx)=x(i);
+    x_area_plot(idx)=x_plot(i);
+    idx=idx+1;
+    end;
+end;
+
+q_square=1./((x.^2));
+q_square_area=1./((x_area.^2));
+var = polyfit(q_square_area,decay_area,1);
+a = var(2); % y-intercept of the fitted line
+b = var(1); % slope of fitted line
+fitline = a+b*q_square_area;
+bfactor=4.*var(1);
+if info_flag==1
+    plot_decay_curve(decay,objectpixelsize,decay_area,x_area_plot,fitline,q_square_area,q_square,zero_angle_scattering,wilson_regime,FSC); drawnow;
+    disp(['Line Fit: y=a+b*x, a: ' num2str(var(2)) ', b: ' num2str(var(1))]);
+    disp(['B-factor: ' num2str(bfactor)]);
+end;
+
+
+
+function [l nr]=calc_fourier_shell(in)
+
+l=0;
+sz=size(in,1);
+sz_2=sz./2+1;
+% for r=1:sz_2
+%     mask_1=tom_spheremask(ones(sz,sz,sz),r,0,[sz_2+1 sz_2+1 sz_2+1]);
+%     mask_2=tom_spheremask(ones(sz,sz,sz),r+1,0,[sz_2+1 sz_2+1 sz_2+1]);
+%     mask=mask_2-mask_1;
+%     s=sum(sum(sum(in.*mask)));
+%     p=sum(sum(sum(mask)));
+%     l(r)=s./p;
+%     %tom_dspcub(mask);drawnow;
+% end;
+idx=1;
+[x,y,z]=ndgrid(0:size(in,1)-1,0:size(in,2)-1,0:size(in,3)-1);
+v = sqrt((x+1-sz_2).^2+(y+1-sz_2).^2+(z+1-sz_2).^2);
+for r=0:sz_2-1
+    ind = find(round(v)==r);    
+    l(idx)=mean(in(ind));
+    nr(idx)=length(ind);
+    idx=idx+1;
+end
+
+function plot_decay_curve(decay,objectpixelsize,decay_area,x_area_plot,fitline,q_square_area,q_square,zero_angle_scattering,wilson_regime,FSC)
+x=([0:q_square./64:q_square]);
+fig=figure;set(fig,'Position',[680   487   802   613]);
+drawnow;
+FSC_weight=sqrt((2.*FSC)./(1+FSC));
+p1=plot(q_square,decay,'Linewidth',2); hold on;
+p2=plot(q_square_area,decay_area,'r-','Linewidth',2);
+p3=plot(q_square_area,fitline,'g-','Linewidth',2);
+p4=plot(q_square,FSC_weight.*max(decay),'m-','Linewidth',2); hold on;
+p=get(p1,'Parent');
+%set(fig,'Position',[80 12 60 20]);
+%set(p,'Ylim',[(min(decay)-1) (max(decay)+1)]);
+%set(t,'Color','white');
+xlabel('Resolution, 1/q^2 [1/(A^2)]');
+set(p,'Ytick',[round((min(decay)-1)):1:round((max(decay)+1))]);
+%set(p,'Xtick',[0:x(end)./10:x(end)]);
+ylabel('log(spherically averaged structure factor curve)');
+grid on;
+p=get(p1,'Parent');
+%xtick=get(p,'Xtick');
+%xtick_nm=zeros(size(xtick));
+%xtick_nm(2:end)=2.*objectpixelsize.*max(xtick).*(1./xtick(2:end));
+
+%for i=2:size(xtick,2)
+%    t=text(xtick(i),-5,sprintf('%0.3g A',xtick_nm(i)));    
+%end;
+
+plot(0,log(zero_angle_scattering),'rx','Linewidth',8);
+tn=text(0,log(zero_angle_scattering),'0.28*N_a_t_o_m_s');
+set(tn,'Color','red');set(tn,'Fontsize',14);
+%l=line([0 q_square(end)],[log(wilson_regime) log(wilson_regime)]);
+wilson_x=[0 q_square(end)];
+wilson_y=[log(wilson_regime) log(wilson_regime)];
+l=plot(wilson_x,wilson_y,'c-');
+set(l,'Color','cyan','Linewidth',2);
+legend('Guinier graph','Fit area','Line fit','FSC weight scaled','Zero Scattering','Wilson regime');
+title(['Guinier Graph, Spherically Averaged Structure Factor Curve, Nyquist @ ' num2str(objectpixelsize.*2) ' A.']);
+hold off;

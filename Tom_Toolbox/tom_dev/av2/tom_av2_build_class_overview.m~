@@ -1,0 +1,45 @@
+function st=tom_av2_build_class_overview(folder,sz)
+
+
+dd=dir(folder);
+
+zz=1;
+
+for i=3:size(dd,1)
+    if (dd(i).isdir==1)
+        [a num]=strtok(dd(3).name,'_')
+        num=strrep(num,'_','');
+        b_path=[folder '/' dd(i).name];
+        
+        try
+            avg=tom_emread([b_path '/avg.em']);
+            avg=avg.Value;
+        catch
+            avg=zeros(sz(1),sz(2));
+        end;
+        st(:,:,zz)=tom_norm(avg+100,'phase');
+        zz=zz+1;
+        
+        try
+            var=tom_emread([b_path '/variance.em']);
+            var=var.Value;
+        catch
+            var=zeros(sz(1),sz(2));
+        end;
+        st(:,:,zz)=tom_norm(var+100,'phase');
+        zz=zz+1;
+        
+        
+        try
+             proj=tom_emread([b_path '/proj.em']);
+             proj=proj.Value;
+        catch
+            proj=zeros(sz(1),sz(2));
+        end;
+        
+        st(:,:,zz)=tom_norm(proj,'phase');
+        zz=zz+1;
+        
+    end;
+        
+end;

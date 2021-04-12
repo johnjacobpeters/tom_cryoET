@@ -1,0 +1,53 @@
+function tom_av2_picklist2xmippstack(picklist,img_typ,)
+% TOM_AV2_ALIGN performs iterative rotational, translational alignment of an image (im) relative to reference (ref)
+%  
+%     [angle_out shift_out ccc aligned_part_sum]=tom_av2_align(ref,im,mask_im,mask_cc_rot,mask_cc_trans,filter_st,num_of_iterations,demo)
+%  
+%  PARAMETERS
+%  
+%    INPUT
+%     ref                 reference image
+%     im                  image to be aligned
+%     mask_im             mask for both, reference and image
+%     mask_cc_rot         mask for polar xcorellation function, rotation alignment
+%     mask_cc_trans       mask for polar xcorellation function, translation alignment
+%     filter_st           filter structure:
+%                          filter.Apply:  1 apply filter, 2 use default values, 0 not
+%                          filter.Value:  vector with parameters [low, high, smooth ...]
+%                          filter.Method: i.e. 'circ', 'quadr', 'bandpass'
+%                          filter.Space: 'real' or 'fourier'
+%                          filter.Times: 'apply filter
+%                          n-times
+%     num_of_iterations   number of iterations for iterative alignment, all
+%                          rotations and shifts are added
+%     demo                flag (1: on, 0: off) for demo mode via graphical interface,
+%                          all alignment steps are shown
+%    
+%    OUTPUT
+%     angle_out           rotation angle in degree, sum of all
+%                          rotation angles
+%     shift_out           shifts in x and y, sum of all shifts
+%     ccc                 normalized xcorrelation coefficient
+%     aligned_part_sum	aligned input image im
+%  
+%  EXAMPLE
+%     read image
+%
+%  
+%  REFERENCES
+%  
+%  SEE ALSO
+%     ...
+%  
+%     created by SN/FB 01/24/06
+%  
+%     Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%     Journal of Structural Biology, 149 (2005), 227-234.
+%  
+%     Copyright (c) 2004-2007
+%     TOM toolbox for Electron Tomography
+%     Max-Planck-Institute of Biochemistry
+%     Dept. Molecular Structural Biology
+%     82152 Martinsried, Germany
+%     http://www.biochem.mpg.de/tom
+% 

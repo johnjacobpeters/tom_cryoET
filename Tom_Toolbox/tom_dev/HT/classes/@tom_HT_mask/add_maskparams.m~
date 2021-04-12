@@ -1,0 +1,18 @@
+function this = add_maskparams(this,type,varargin)
+
+idx = size(this.params,1);
+
+switch lower(type)
+    case 'circle'
+        params = [varargin{1},varargin{2},varargin{3},varargin{4}];
+    case 'rectangle'
+        params = [varargin{1},varargin{2},varargin{3},varargin{4}];
+    case 'polygon'
+    case 'freehand'
+        params = varargin{1};
+    case 'magic wand'
+        params = {varargin{1},varargin{2},varargin{3},varargin{4},varargin{5}};
+end
+
+this.params(idx) = params;
+this.name(idx) = type;

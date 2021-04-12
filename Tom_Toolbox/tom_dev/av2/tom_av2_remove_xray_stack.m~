@@ -1,0 +1,22 @@
+function tom_av2_remove_xray_stack(input)
+
+
+if (tom_isemfile(input))
+    header=tom_reademheader(input);
+    for i=1:size(header.Header,3)
+        im=tom_emreadc(input,'subregion',[1 1 iz],[header.Header.Size(1)-1 header.Header.Size(2)-1 0]);
+        im.Value=tom_xraycorrect(im.Value);
+    end;
+    
+    
+else
+    
+    st=importdata(input);
+    
+    for i=1:length(length(st.textdata))
+        im=tom_spiderread(st.textdata{i});
+        im.Value=tom_xraycorrect(im.Value);
+        tom_spiderwrite(st.textdata{i}.im);
+    end;
+    
+end;

@@ -1,0 +1,147 @@
+%use imgName and tmplName as a cell array.
+%the cell array entries must include the full absolute or relative path to the volumes
+function result = tom_os3_picker_parallel(optionsName)
+
+
+%% generate return structure where all the values are saved
+%
+%correlation peak
+res.peaks = {};
+%
+%angles of best match
+res.angles = {};
+%
+%peak to sidelobe ratio
+res.psr = {};
+%
+%current template - without rotation
+res.templates = {};
+%
+%the imaga itself
+res.img = {};
+%
+%correlation of peaks and autocorrelation
+res.autocorr = {};
+%
+%storage for names of image and template
+res.path.image = {};
+res.path.template = {};
+
+
+%% read options file for template matching
+
+    if(ischar(optionsName))
+        if(~exist('optionsName'))
+            optionsName = '/fs/sandy02/lv05/pool/bmsan/apps/tom_dev/Oscar3/matlabPicker/options/options.txt';
+        end;
+        options = tom_os3_readOptions(optionsName);
+    else
+        options = optionsName;
+    end;    
+    
+    res.flags = options;
+%% counter
+    resCounter = 1;
+ 
+%%  determine dimension
+    dimension = options.job.jobType;
+    dimension = str2double(dimension(1));
+%%
+    if(dimension == 2)
+        
+%%      create list of parallel jobs
+        jobs = tom_os3_createJobListNEW(options);
+        if(strcmp(options.job.mode,'parallel'))
+%%          create a job on a worker pool
+            parallelJob = tom_os3_prepareParallel(options.parallel.jobManager,'jobmanager','TaskParallel',options.parallel.jobName);
+        
+%%      create parallel tasks
+            for jobCounter = 1:length(jobs)
+                createTask(parallelJob,@tom_os3_findTemplateNEW,1,{jobs{jobCounter}});
+            end;
+%%      execute parallel jobs            
+            submit(parallelJob);
+
+            waitForState(parallelJob);
+            matchingResults = getAllOutputArguments(parallelJob);
+
+            %find errors
+            [result_p errorsum]=tom_get_paraell_results(parallelJob);
+            if (errorsum > 0);
+                errordlg('An error occurded during parallel execution. See matlab console for more information.','Parallel Error');
+                for error=1:size(result_p,1)
+                    disp(['Hostname: ' result_p{error,1} '  Error: ' result_p{error,2}]);
+                end;
+            end;
+            destroy(parallelJob);
+%%      
+        else
+            matchingResults = {};
+            for jobIterator = 1:length(jobs)
+                matchingResults{jobIterator} = tom_os3_findTemplateNEW(jobs{jobIterator});
+            end;
+        end;
+%%     collect results
+    
+%       result = tom_os3_collectResultsNEW(options);
+
+       
+       
+%%        
+    elseif(dimension == 3)
+        
+%for each volume loop possible here       
+
+%%      create list of parallel jobs
+        jobs = tom_os3_createJobListNEW(options);
+        
+        if(strcmp(options.job.mode,'parallel'))
+%%      create a job on a worker pool
+            parallelJob = tom_os3_prepareParallel(options.parallel.jobManager,'jobmanager','TaskParallel',options.parallel.jobName);
+
+%%          create parallel tasks
+            for jobCounter = 1:length(jobs)
+                createTask(parallelJob, @tom_os3_findTemplateNEW ,1,{jobs{jobCounter}});
+            end;
+            
+%%      execute parallel jobs            
+            submit(parallelJob);
+
+            waitForState(parallelJob);
+            matchingResults = getAllOutputArguments(parallelJob);
+
+            %find errors
+            [result_p errorsum]=tom_get_paraell_results(parallelJob);
+            if (errorsum > 0);
+                errordlg('An error occurded during parallel execution. See matlab console for more information.','Parallel Error');
+                for error=1:size(result_p,1)
+                    disp(['Hostname: ' result_p{error,1} '  Error: ' result_p{error,2}]);
+                end;
+            end;
+            destroy(parallelJob);
+        else
+            
+%%      test environment (on one machine)        
+            matchingResults = {};
+            for jobIterator = 1:length(jobs)
+                matchingResults{jobIterator} = tom_os3_findTemplateNEW(jobs{jobIterator});
+            end;
+            
+        end;
+        
+%%      collect results        
+        
+        result      = tom_os3_collectResultsNEW(options);
+        
+        picklist    = tom_os3_returnPicklist(tom_os3_peakValue(result.peaks,result.psr,result.autoc,options),result.angles,result.job.templateSize,3,options);
+        
+        subVolumes  = tom_os3_collectSubVolumes(picklist,result.job.volumeFile);
+        
+        for i=1:length(subVolumes)
+            tmp = subVolumes{i};
+            figure;tom_dspcub(tmp.volume);
+        end
+
+    else
+        errordlg('Input volume has no valid dimension. Aborting...');
+    end;

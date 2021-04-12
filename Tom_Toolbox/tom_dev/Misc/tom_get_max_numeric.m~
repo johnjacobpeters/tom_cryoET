@@ -1,0 +1,62 @@
+function max_num=tom_get_max_numeric(input_cell,direction)
+%TOM_AV2_GET_MAX_NUMERIC finds the max number in a cell array of strings
+%
+%   max_num=tom_get_max_numeric(input_cell)
+%
+%PARAMETERS
+%
+%  INPUT
+%   input_cell          cell array with strings
+%   direction           forward or backward
+%
+%
+%  OUTPUT
+%   max_num             maximum numeric
+%
+%EXAMPLE
+% 
+% tom_get_max_numeric({t_1.em,t_2.em,t_3.em})
+%
+%   
+%
+%REFERENCES
+%
+%SEE ALSO
+%   TOM_AV2_STACKBROWSER
+%
+%   created by FB(eckster) 06/16/08
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2007
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+if nargin < 2
+    direction=''
+
+zz=1;
+for i=1:size(input_cell,2)
+    tmp=input_cell{i};
+   
+    
+    for ii=1:size(tmp,2)
+        tmpp=findstr(tmp(ii),'0 1 2 3 4 5 6 7 8 9');
+        if (isempty(tmpp)==0)
+            num(zz)=tmp(ii);
+            zz=zz+1;
+        end;
+        if (zz > 1) && isempty(tmpp)
+            break;
+        end;
+    end;
+    all_idx(i)=str2double(num);
+    clear('num');
+    zz=1;
+end;
+
+max_num=max(all_idx);

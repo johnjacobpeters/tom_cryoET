@@ -1,0 +1,3 @@
+function get_partsize(this)
+
+set(this.axeshandles(r,c)

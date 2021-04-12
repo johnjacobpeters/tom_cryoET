@@ -1,0 +1,81 @@
+function inp_ref_stack=tom_av2_index_inp_sample_refstack(ref_stack,increment,mask,norm_flag)
+%tom_av2_index_inp_sample_refstack performs in-plane rotation of given
+%referenc
+%
+%   inp_ref_stack=tom_av2_index_inp_sample_refstack(ref_stack,increment,mask,norm_flag)
+%PARAMETERS
+%
+%  INPUT
+%   index_stack          index stack computed of the ref stack by tom_av2_index_calc
+%   lookup               lookup table for the org pos in ref stack by tom_av2_index_calc 
+%   part                 particle which should be aligned to ref stack
+%   align_flag           (no_alignment) flag for in-plane alignment ...use 'align' for in plane alignment 
+%   mask_cc              mask for cross correlation function ...to get rid of side peaks
+%   demo_flag            (no_demo) use 'demo' or 'demo_final' 
+%   
+%  OUTPUT
+%   nr                  number of best matching reference
+%   pos_out             position of cc-peak      
+%   val_out             value of cc-peak
+%   
+% 
+%
+%EXAMPLE
+%   [ref_num peak val]=tom_av2_index_search(idx_stack.Value,lookup,tom_bandpass(tmp_im,3,70),'no_alignment',mask_cc);
+%   
+%
+%REFERENCES
+%
+%SEE ALSO
+%   tom_av2_index_calc, tom_av2_index_bintree_not_2_index.m,
+%   tom_av2_index_plot_indexstack.m
+%
+%   created by fb (eckster)
+%   updated by ...
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2007
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+sz_rs=size(ref_stack);
+if (length(size(ref_stack))==2)
+    sz_rs(3)=1;
+end;
+
+if nargin < 2
+    increment=5;
+end;
+
+if nargin < 3
+    mask=tom_spheremask(ones(sz_rs(1),sz_rs(2)),round(sz_rs(1)./2)-2,2);
+end
+
+if nargin < 4
+    norm_flag='phase';
+end
+
+
+
+rotations=[0:increment:(360-increment)];
+
+
+%allocate some memory
+inp_ref_stack=zeros(sz_rs(1),sz_rs(2),length(rotations).*sz_rs(3));
+
+%loop over all references
+zz=1;
+for i=1:size(ref_stack,3)
+    %loop over all in-plane rotions
+    for ii=1:length(rotations)
+        tmp=tom_norm((ref_stack(:,:,i)+1).*2,norm_flag).*mask;
+        inp_ref_stack(:,:,zz)=tom_rotate(tmp,rotations(ii));
+        zz=zz+1;
+    end;
+end;
+
+

@@ -1,0 +1,44 @@
+function tom_compare_fuctions_lists(folder1,folder2,prefix)
+%  TOM_COMPARE_FUCTIONS_LISTS compares functions of 2 folders
+%                             useful for release management
+%  
+%     
+%     tom_compare_fuctions_lists(folder1,folder2,prefix,ouputfolder)
+%  
+%  
+%  PARAMETERS
+%  
+%    INPUT
+%     folder1        image or Volume as single!
+%     folder1        rotation matrixs [phi, psi, the] (rot X1 X3 Z2)
+%     prefix         interpolation only 'linear' implemented
+%     output         in=image  [centerX centerY]       
+%                         
+%  
+%    
+%    OUTPUT
+%  
+%  
+%
+%  
+%  EXAMPLE
+%     im=tom_emread('pyrodictium_1.em');
+%
+%  
+%  REFERENCES
+%  
+%  SEE ALSO
+%     tom_volxyz, tom_rec3d, tom_recparticles
+%  
+%     created by FB 12/04/04
+%     updated by FB 07/10/05
+%  
+%     Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%     Journal of Structural Biology, 149 (2005), 227-234.
+%  
+%     Copyright (c) 2004-2007
+%     TOM toolbox for Electron Tomography
+%     Max-Planck-Institute of Biochemistry
+%     Dept. Molecular Structural Biology
+%     82152 Martinsried, Germany
+%     http://www.biochem.mpg.de/tom

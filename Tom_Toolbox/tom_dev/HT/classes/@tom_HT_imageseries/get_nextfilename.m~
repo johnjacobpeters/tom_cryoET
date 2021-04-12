@@ -1,0 +1,11 @@
+function this = get_nextfilename(this)
+
+%first call in this object
+if isempty(this.currentfile)
+    this = get_fullfilenames(this);
+    this.currentfil
+else
+    
+end
+
+

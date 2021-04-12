@@ -1,0 +1,8 @@
+function this = normalize(this)
+
+set(this.figurehandle,'Units','normalized');
+
+    for c = 1:this.cols
+        set(this.axeshandles,'Units','normalized');
+    end
+end

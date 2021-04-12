@@ -1,0 +1,107 @@
+function [Dz,success] = tom_HT_ctffitter(filename,psdsize,lowcutoff,highcutoff,demomode)
+
+
+if nargin < 5
+    demomode = true;
+end
+
+if nargin < 4
+    highcutoff = 0.5;
+end
+
+if nargin < 3
+    lowcutoff = 0.01;
+end
+
+if nargin < 2
+    psdsize = 256;
+end
+
+if ischar(filename)
+
+    %open the file
+    im = tom_emreadc(filename);
+    %calc the psd
+    ps = fftshift(tom_calc_periodogram(im.Value,psdsize));
+    im = rmfield(im,'Value');
+    ps = tom_cart2polar(ps);
+    ps = log(double(sum(ps,2)./(size(ps,2))));
+    
+    ps = smooth(ps,size(ps,2)*.05);
+
+else
+    ps = filename;
+end
+
+%calculate cutoffs in pixel
+lowcutoff = ceil(lowcutoff*psdsize);
+highcutoff = ceil(highcutoff*psdsize);
+    
+if demomode == true
+    figure;
+    subplot(3,1,1);plot(ps);hold on;title('Original powerspectrum');set(gca,'XLim',[1 psdsize/2]);
+    set(gcf,'Position',[281   128   969   936]);
+end
+
+ps = ps(lowcutoff:highcutoff);
+pssize = highcutoff-lowcutoff+1;
+%fit the noise function to the experimental power spectrum
+lb = [];
+ub = [];
+Aeq = [1 sqrt(pssize) pssize pssize.^2];
+beq = ps(end);
+nonlcon = [];
+%x0 = [10 1 1e-6 1e-6]';
+x0 = [0 0 0 0]';
+snoise = double(lowcutoff:highcutoff)';
+A = [ones(size(snoise,1),1) sqrt(snoise) snoise snoise.^2];
+b = ps;
+options = optimset('LargeScale','off','Diagnostics','on','Display','on','TolCon',1e-5,'TolFun',1e-5,'MaxFunEvals',300,'MaxIter',100);
+noiseparams = fmincon(@noiseobjfun, x0, A, b, Aeq, beq, lb, ub, nonlcon, options,A,b);
+noisefunction = noiseplotfun(1:pssize,noiseparams);
+
+if demomode == true
+    plot(noisefunction,'--r');
+end
+
+%calculation of noise free power spectrum
+ps_noisefree = ps - noisefunction;
+ps_noise
+%fit the envelope function to the experimental power spectrum
+lb = [];
+ub = [];
+Aeq = [1 1 1 1;1 sqrt(pssize) pssize pssize.^2];
+beq = [ps_noisefree(1);ps_noisefree(end)];
+nonlcon = [];
+x0 = [max(ps) 0 0 0]';
+senv = (lowcutoff:highcutoff)';
+A = [ones(size(senv,1),1) sqrt(senv) senv senv.^2];
+b = ps;
+options = optimset('LargeScale','off','Diagnostics','on','Display','on','TolCon',1e-5,'TolFun',1e-5,'MaxFunEvals',300,'MaxIter',100);
+envparams = fmincon(@noiseobjfun, x0, -A, -b, Aeq, beq, lb, ub, nonlcon, options,A,b);
+envfunction = noiseplotfun(1:pssize,envparams);
+
+envfunction = envfunction + noisefunction;
+avgfunction = (envfunction + noisefunction)./2;
+
+if demomode == true
+    plot(envfunction,'--r');
+    plot(avgfunction,'--g');
+end
+
+
+%--------------------------------------------------------------------------
+% noise fit function
+%--------------------------------------------------------------------------
+function val = noiseobjfun(x,A,b)
+bhat = ones(size(b,1),1);
+l = size(bhat,1);
+bhat(round(l/2):end)=0;
+val = norm((A*x-b).*bhat,1);
+
+%--------------------------------------------------------------------------
+% noise plot function                                           
+%--------------------------------------------------------------------------
+function y = noiseplotfun(x,n)
+i=1:size(x,2);
+y = (n(1)+n(2).*(i.^(1/2))+n(3).*i+n(4).*i.^2)';

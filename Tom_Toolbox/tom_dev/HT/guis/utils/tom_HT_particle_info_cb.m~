@@ -1,0 +1,7 @@
+function tom_HT_particle_info_cb(hObject)
+
+handles = guidata(hObject);
+
+string{1} = ['particle
+
+guidata(hObject, handles);

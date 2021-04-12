@@ -1,0 +1,40 @@
+function tom_show_cluster_status(flag)
+
+if nargin==0
+    flag='on';
+end;
+
+if strcmp(flag,'on')
+
+    unix('ssh cluster01 gkrellm -g +950+5 &');
+
+    pause(.5);
+    unix('ssh cluster02 gkrellm -g +950+5 &');
+
+    pause(.5);
+    unix('ssh cluster03 gkrellm -g +1190+5 &');
+
+    pause(.5);
+    unix('ssh cluster04 gkrellm -g +1430+5 &');
+
+    pause(.5);
+    unix('ssh cluster05 gkrellm -g +1670+5 &');
+    pause(.5);
+    unix('ssh cluster06 gkrellm -g +1670+5 &');
+    pause(.5);
+    unix('ssh cluster07 gkrellm -g +1670+5 &');
+    pause(.5);
+    unix('ssh cluster08 gkrellm -g +1670+5 &');
+
+else
+
+    unix('ssh cluster02 killall gkrellm &');
+
+    pause(.5);
+    unix('ssh cluster03 killall gkrellm &');
+    pause(.5);
+    unix('ssh cluster04 killall gkrellm &');
+
+    pause(.5);
+    unix('ssh cluster05 killall gkrellm &');
+end;

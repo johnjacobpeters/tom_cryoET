@@ -1,0 +1,15 @@
+function cell=tom_HT_align2d2cell(align2d,package)
+
+
+for i=package(1):package(2)
+    cell{i,1}=1;
+    cell{i,2}=1;
+    cell{i,3}=align2d(1,1).ccc;
+    cell{i,4}=align2d(1,1).position.y;
+    cell{i,1}=align2d(1,1).position.x;
+    
+   =align2d(1,i).class;
+    cell{i,1}=align2d(1,i).quality;
+    
+
+end;

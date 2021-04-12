@@ -1,0 +1,37 @@
+select * from micrograph where micrograph.idmicrograph not in ( (select distinct micrograph.idmicrograph from micrograph,particles where micrograph.idmicrograph = particles.micrograph_idmicrograph) );
+
+
+
+
+CREATE TRIGGER del_check_particles AFTER DELETE ON particles
+  delete from micrograph;
+END;
+
+
+
+CREATE TRIGGER del_check_part BEFORE INSERT ON micrographs
+FOR EACH ROW BEGIN
+set @t=1
+END;
+
+
+
+CREATE TRIGGER del_check_part AFTER DELETE ON particles for each row delete from micrograph where micrograph.idmicrograph not in ( (select distinct micrograph.idmicrograph from micrograph,particles where micrograph.idmicrograph = particles.micrograph_idmicrograph) );
+
+
+
+CREATE TRIGGER del_check_partt AFTER DELETE ON particles for each row begin select * from micrograph; select * from micrograph; end;
+
+
+delimiter |
+
+CREATE TRIGGER del_C AFTER DELETE ON A
+  FOR EACH ROW BEGIN
+    DECLARE total DECIMAL(8,2);
+    select idC from C into total;
+    DELETE FROM B;
+    DELETE FROM C;
+  END;
+|
+
+delimiter ;

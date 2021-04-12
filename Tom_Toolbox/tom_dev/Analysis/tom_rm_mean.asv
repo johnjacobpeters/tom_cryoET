@@ -1,0 +1,18 @@
+function [in mean_out]=tom_rm_mean(in,mean_in)
+
+if (nargin==1)
+
+    for i=1:size(in,2)
+      mean_out(i)=mean(in(:,i));
+        in(:,i)=in(:,i)-mean_out(i);
+    end;
+
+else
+    %inverse case
+     for i=1:size(in,2)
+        mean_out(i)=mean(in(:,i));
+        in(:,i)=in(:,i)-mean_out(i);
+    end;
+    
+
+end;

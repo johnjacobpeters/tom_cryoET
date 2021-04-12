@@ -1,0 +1,59 @@
+function im=tom_apply_mask(im,mask,flag,text)
+%
+%Performs exception handling for tom_av2_rec gui
+%
+%
+%SYNTAX
+%im=tom_apply_mask(im,mask,flag,text)
+%
+%DESCRIPTION
+%
+% happy young sporty function searching for a nice gui  
+%
+%Input
+%   im                :handles struct of gui
+%   mask              :struct including gui values
+%   flag              :string with items to be checked                    
+%   text              :error or warning text
+%Ouput
+%   im                :image.*mask
+%                                       
+%
+%EXAMPLE
+%
+%im=tom_emread('pyrodictium_1.em');
+%im=tom_apply_mask(im,tom_spheremask(ones(30,30),5),'interactive-save','mask for projection differs in size');
+%
+%SEE ALSO
+%
+% get_gui_values
+%
+%Copyright (c) 2005
+%TOM toolbox for Electron Tomography
+%Max-Planck-Institute for Biochemistry
+%Dept. Molecular Structural Biology
+%82152 Martinsried, Germany
+%http://www.biochem.mpg.de/tom
+%
+%Created 20/10/06 vom Isar Beder
+
+if (strcmp(flag,'save-interactive'))
+    dims_im=max(size(size(im)));
+    dims_mask=max(size(size(im)));
+    
+    if (dims_im~=dims_mask)
+        im=0;
+        errordlg(text);
+    end;
+    
+    if (sum(size(mask)==size(im))~=dims_im)
+        im=0;
+        errordlg(text);
+    end;
+end;
+
+
+if (strcmp(flag,'wild-west'))
+    
+end;
+

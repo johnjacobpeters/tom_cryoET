@@ -1,0 +1,21 @@
+function b=check_bfactor_test
+p='/fs/sun16/lv01/pool/pool-nickell3/26S/em/data/Titan/CWT/14022011/15022011/low';
+d=dir(p);
+for i=3:
+idx=1;
+parfor i=3:size(d,1)
+     b(idx).name=[p filesep d(i).name];
+    try
+    in=tom_emreadc3([p filesep d(i).name]);
+     [bfactor]=tom_fit_bfactor2D(in.Value, in.Header.Objectpixelsize, [3 8],256,0);
+     b(idx).bfactor=bfactor;
+     b(idx).valid=1;
+    catch
+     b(idx).bfactor=0;
+     b(idx).valid=0;        
+    end;
+     idx=idx+1;
+end;
+save('b_factor','b')
+     
+    

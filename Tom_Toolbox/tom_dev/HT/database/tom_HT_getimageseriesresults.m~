@@ -1,0 +1,6 @@
+function result = tom_HT_getimageseriesresults(projectstruct,seriesname)
+
+
+seriesid = getimageseriesid_from_name(this,seriesname);
+
+result = fetch(projectstruct.conn,['SELECT e.name FROM res_imageseriessort ris JOIN results r ON ris.results_result_id=r.result_id JOIN experiment e ON r.experiment_id=e.experiment_id WHERE ris.micrograph_groups_micrographgroup_id = ' num2str(seriesid)]);

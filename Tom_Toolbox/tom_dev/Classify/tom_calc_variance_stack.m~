@@ -1,0 +1,15 @@
+function variance=tom_calc_variance_stack(stack,flag)
+
+if flag
+
+mean_im=sum(stack,3)./size(stack,3);
+
+
+variance=zeros(size(stack,1),size(stack,2));
+for i=1:size(stack,3)
+    
+    diff=(stack(:,:,i)-mean_im);
+    variance=variance + (diff.*diff);
+end;
+
+variance=variance./size(stack,3);

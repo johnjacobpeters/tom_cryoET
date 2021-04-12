@@ -1,0 +1,5 @@
+function this=createdbstack(this,name,comment)
+
+fastinsert(this.projectstruct.conn,'particle_groups',{'name','description','date','radius'},{name,comment,datestr(now),32});
+result = exec(handles.projectstruct.conn,'SELECT LAST_INSERT_ID() AS lastid');
+this.stackid = 

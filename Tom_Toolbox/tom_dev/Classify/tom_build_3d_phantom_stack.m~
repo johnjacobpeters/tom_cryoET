@@ -1,0 +1,16 @@
+function tom_build_3d_phantom_stack(filename_out,number)
+
+moped=tom_av2_build_artificial26S;
+
+
+ang_inkre=360./number(1);
+
+
+for i=1:number(1)
+    
+    for ii=1:number(2)
+    moped_rot=tom_rotate(moped,[0 0 angle]);
+    tom_emwrite(filename,moped_rot);
+
+end;
+

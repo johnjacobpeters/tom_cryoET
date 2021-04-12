@@ -1,0 +1,192 @@
+function tom_av2_high2low_transform(input_sel,input_htl,output_sel,flag,match_flag)
+%tom_av2_high2low_transform transforms a high .sel into a low .sel (or inverse)
+%
+%   tom_av2_high2low_transform(input_sel,input_htl,output_sel,flag,match_flag)
+%
+%  TOM_AV2_HIGH2LOW_TRANSFORM transforms a high .sel into a low .sel (or
+%  inverse) by using a .htl file to find the corresponding high or low
+%  particles
+%  
+%
+%PARAMETERS
+%
+%  INPUT
+%   input_sel           xmipp sel filename
+%   input_htl           htl filename
+%   output_sel          filename of the output .sel containig the tranfered
+%                        parts
+%   flag                (pair-only) use 'all' to get high and low
+%   match_flag          (full) gives the direction of the match high2low
+%                        low2 high ...only needed if just the particle
+%                        number should be used to transform for e.g.
+%                        transfering binned highs 2 unbinned lows
+%                        (triggers the matching behaviour if full the complete path of the particle is used
+%                          if high2low or low2high part nr is only used    )
+%
+%  OUTPUT
+%
+%EXAMPLE
+%     
+%  
+%   tom_av2_high2low_transform('in.sel','11_12_13_14_comb.htl','cl3ow.sel');
+%   transfers particles from in.sel to by matching the full path in htl and sel file   
+%   only low particles are written to the .sel file 
+%   (the ma)
+%  
+%
+%   tom_av2_high2low_transform('iter49_cl3.sel','11_12_13_14_comb.htl','cl3ow.sel','pair-only','high2low');
+%   transfers the the binned particles from iter49_cl3.sel to by only matching the part numbers  
+%   only low particles are written to the .sel file
+%   
+%
+%   tom_av2_high2low_transform('iter49_cl3.sel','11_12_13_14_comb.htl','cl3ow.sel','all','high2low');
+%   transfers the the binned particles from iter49_cl3.sel to by only matching the part numbers  
+%   high and low particles are written to the .sel file   
+%
+%   
+%
+%
+%REFERENCES
+%
+%SEE ALSO
+%   
+%
+%   created by AK 1/19/06 pimped by fb
+%
+%   Nickell et al., 'TOM software toolbox: acquisition and analysis for electron tomography',
+%   Journal of Structural Biology, 149 (2005), 227-234.
+%
+%   Copyright (c) 2004-2007
+%   TOM toolbox for Electron Tomography
+%   Max-Planck-Institute of Biochemistry
+%   Dept. Molecular Structural Biology
+%   82152 Martinsried, Germany
+%   http://www.biochem.mpg.de/tom
+
+if (nargin<5)
+   match_flag='full'; 
+end;
+
+in_sel=importdata(input_sel);
+
+in_htl=importdata(input_htl);
+
+for i=1:length(in_htl)
+    [start rest]=strtok(in_htl{i});
+     names_h{i}=deblank(start);
+     if  (strcmp(match_flag,'full')==0)
+         [a b c]=fileparts(names_h{i});
+         names_h_tmp{i}=[b c];
+     else
+        names_h_tmp{i}=names_h{i};
+     end;
+     tmp_l=deblank(strrep(rest,',',''));
+     names_l{i}=tmp_l(2:end);
+     if  (strcmp(match_flag,'full')==0)
+         [a b c]=fileparts(names_h{i});
+         names_l_tmp{i}=[b c];
+     else
+         names_l_tmp{i}=names_l{i};
+     end;
+end;
+
+
+
+if strcmp(match_flag,'full')
+    dir_flag='';
+    for i=1:length(in_sel.textdata)
+        
+        %check for input high or low
+        if (isempty(find(ismember(names_h,in_sel.textdata{i})))==0)
+            dir_flag='high2low';
+            break;
+        end;
+        
+        if (isempty(find(ismember(names_l,in_sel.textdata{i})))==0)
+            dir_flag='low2high';
+            break;
+        end;
+        
+    end;
+    if (isempty(dir_flag))
+        error('no match between input sel and htl file !!');
+        return;
+    end;
+    in_sel_tmp=in_sel.textdata;
+else
+    dir_flag=match_flag;
+    for ii=1:length(in_sel.textdata)
+        [a b c]=fileparts(in_sel.textdata{ii});
+        in_sel_tmp{ii}=[b c];
+    end;
+end;
+
+
+
+
+
+in_count=1;
+out_count=1;
+%build up lookuptable
+five_p=round(length(in_sel.textdata)./20);
+zz_p=1;
+tic;
+
+fp=fopen(output_sel,'w');
+
+
+for i=1:length(in_sel.textdata)
+    
+%     if (strcmp(flag,'all'))
+%         % fprintf(fp,[in_sel.textdata{i} '\n']);
+%     
+%     end;
+    
+    if (strcmp(dir_flag,'high2low'))
+        idx=find(ismember(names_h_tmp,in_sel_tmp{i}));
+        if (isempty(idx)==0)
+            fprintf(fp,[names_l{idx} ' 1\n']);
+            in_count=in_count+1;
+        else
+            out_count=out_count+1;
+        end;
+         if (strcmp(flag,'all'))
+        % fprintf(fp,[in_sel.textdata{i} '\n']);
+             fprintf(fp,[names_h{idx} ' 1\n']);
+        end;
+        
+    end;
+    if (strcmp(dir_flag,'low2high'))
+        idx=find(ismember(names_l_tmp,in_sel_tmp{i}));
+        if (isempty(idx)==0)
+            fprintf(fp,[names_h{idx} ' 1\n']);
+            in_count=in_count+1;
+        else
+            out_count=out_count+1;
+        end;
+         if (strcmp(flag,'all'))
+        % fprintf(fp,[in_sel.textdata{i} '\n']);
+             fprintf(fp,[names_l{idx} ' 0\n']);
+        end;
+    
+    end;
+    
+    
+    if (mod(i,five_p)==0)
+        toc;
+        disp([num2str(zz_p.*5) '% done'] );
+        zz_p=zz_p+1;
+        tic;
+    end;
+    
+    
+end;
+
+
+
+fclose(fp);
+
+
+disp(['Particles in HTL-File: ' num2str(in_count-1) ' Particles not in HTL-File: ' num2str(out_count-1) ]);
+
+

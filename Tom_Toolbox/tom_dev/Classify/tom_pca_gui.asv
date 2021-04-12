@@ -1,0 +1,198 @@
+function varargout = tom_pca_gui(varargin)
+% TOM_PCA_GUI M-file for tom_pca_gui.fig
+%      TOM_PCA_GUI, by itself, creates a new TOM_PCA_GUI or raises the existing
+%      singleton*.
+%
+%      H = TOM_PCA_GUI returns the handle to a new TOM_PCA_GUI or the handle to
+%      the existing singleton*.
+%
+%      TOM_PCA_GUI('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in TOM_PCA_GUI.M with the given input arguments.
+%
+%      TOM_PCA_GUI('Property','Value',...) creates a new TOM_PCA_GUI or raises the
+%      existing singleton*.  Starting from the left, property value pairs are
+%      applied to the GUI before tom_pca_gui_OpeningFunction gets called.  An
+%      unrecognized property name or invalid value makes property application
+%      stop.  All inputs are passed to tom_pca_gui_OpeningFcn via varargin.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help tom_pca_gui
+
+% Last Modified by GUIDE v2.5 27-Apr-2006 16:21:53
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @tom_pca_gui_OpeningFcn, ...
+                   'gui_OutputFcn',  @tom_pca_gui_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin && ischar(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+
+% --- Executes just before tom_pca_gui is made visible.
+function tom_pca_gui_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to tom_pca_gui (see VARARGIN)
+
+% Choose default command line output for tom_pca_gui
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes tom_pca_gui wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+
+% --- Outputs from this function are returned to the command line.
+function varargout = tom_pca_gui_OutputFcn(hObject, eventdata, handles) 
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+
+
+function path_input_Callback(hObject, eventdata, handles)
+% hObject    handle to path_input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of path_input as text
+%        str2double(get(hObject,'String')) returns contents of path_input as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function path_input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to path_input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in browse_input.
+function browse_input_Callback(hObject, eventdata, handles)
+% hObject    handle to browse_input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[file path]=uigetfile;
+
+
+set(handles.path_input,'String',[path file]);
+
+
+% --- Executes on button press in calc_pca.
+function calc_pca_Callback(hObject, eventdata, handles)
+% hObject    handle to calc_pca (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+st=get_gui_values(handles);
+
+disp('reading stack...');
+stack=tom_emread(st.in_path);
+stack=stack.Value;
+disp('reshaping stack...');
+stack_new=zeros(size(stack,3),size(stack,1).*size(stack,2));
+for i=1:size(stack,3)
+    st_new(i,:)=reshape(stack(:,:,i),1,size(stack,1).*size(stack,2));
+end;
+disp('calculating pca...');
+[st handles.mean]=tom_rm_mean(stack);
+[handles.coefs,handles.scores,variances,t2] = princomp(st_new);
+
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function eigenvects_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to eigenvects (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in disp_data.
+function disp_data_Callback(hObject, eventdata, handles)
+% hObject    handle to disp_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+st=get_gui_values(handles);
+
+axes(handles.img);
+%if 
+plot(handles.scores(:,st.eigvects(1)),handles.scores(:,st.eigvects(2)),'r+');
+
+
+disp('mumu');
+
+% --- Executes on button press in show_images.
+function show_images_Callback(hObject, eventdata, handles)
+% hObject    handle to show_images (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+st=get_gui_values(handles);
+
+axes(handles.img);
+[X,Y]=ginput(1);
+
+v_tmp=[X Y];
+
+for i=1:size(st.eigvects,1)
+    tmp(:,i)=handles.coefs(:,st.eigvects(i));
+end;
+
+img_tmp=tmp*v_tmp';
+
+sz=sqrt(size(img_tmp,1));
+
+%add the
+img
+
+figure; tom_imagesc(reshape(img_tmp,sz,sz));
+
+
+
+
+function st=get_gui_values(handles)
+
+
+st.in_path=get(handles.path_input,'String');
+tmp=get(handles.eigenvects,'String');
+
+st.eigvects=sscanf(strrep(tmp,';',' '),'%d %d');
+
+
+

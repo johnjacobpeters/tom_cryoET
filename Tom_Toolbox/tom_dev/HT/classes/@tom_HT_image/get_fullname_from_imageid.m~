@@ -1,0 +1,7 @@
+function fullname = get_fullname_from_micrographid(this,micrographid)
+
+result = fetch(this.projectstruct.conn,['SELECT filename FROM micrographs WHERE micrograph_id = ' num2str(micrographid) ' AND projects_project_id = ' num2str(this.projectstruct.projectid)]);
+
+settings = tom_HT_settings();
+
+fullname = [settings.data_basedir,'/',this.projectstruct.projectname,'/micrographs/' result.filename{1}];
