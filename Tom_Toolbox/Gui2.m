@@ -1,38 +1,38 @@
-function varargout = gui_demo(varargin)
+function varargout = Gui2(varargin)
 %dependencies cut_part_and_movefucn.m, make_Align_after_relionfunc.m,
 %tom_av3_stackbrowser.m, tom_cylindermask.m, tom_spheremask.m,
 %deconv_filter_all_abs.m, tom_deconv_tomo_abs.m, tom_volxyz.m
-% GUI_DEMO MATLAB code for gui_demo.fig
-%      GUI_DEMO, by itself, creates a new GUI_DEMO or raises the existing
+% GUI2 MATLAB code for Gui2.fig
+%      GUI2, by itself, creates a new GUI2 or raises the existing
 %      singleton*.
 %
-%      H = GUI_DEMO returns the handle to a new GUI_DEMO or the handle to
+%      H = GUI2 returns the handle to a new GUI2 or the handle to
 %      the existing singleton*.
 %
-%      GUI_DEMO('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in GUI_DEMO.M with the given input arguments.
+%      GUI2('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in GUI2.M with the given input arguments.
 %
-%      GUI_DEMO('Property','Value',...) creates a new GUI_DEMO or raises the
+%      GUI2('Property','Value',...) creates a new GUI2 or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before gui_demo_OpeningFcn gets called.  An
+%      applied to the GUI before Gui2_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to gui_demo_OpeningFcn via varargin.
+%      stop.  All inputs are passed to Gui2_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help gui_demo
+% Edit the above text to modify the response to help Gui2
 
-% Last Modified by GUIDE v2.5 09-Apr-2021 11:31:31
+% Last Modified by GUIDE v2.5 31-Mar-2021 14:29:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @gui_demo_OpeningFcn, ...
-                   'gui_OutputFcn',  @gui_demo_OutputFcn, ...
+                   'gui_OpeningFcn', @Gui2_OpeningFcn, ...
+                   'gui_OutputFcn',  @Gui2_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -47,26 +47,26 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before gui_demo is made visible.
-function gui_demo_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before Gui2 is made visible.
+function Gui2_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to gui_demo (see VARARGIN)
+% varargin   command line arguments to Gui2 (see VARARGIN)
 
-% Choose default command line output for gui_demo
+% Choose default command line output for Gui2
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes gui_demo wait for user response (see UIRESUME)
+% UIWAIT makes Gui2 wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = gui_demo_OutputFcn(hObject, eventdata, handles) 
+function varargout = Gui2_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -832,7 +832,7 @@ data=guidata(hObject);
 dir=data.edit40;
 pixSize = data.edit41;
 defocus = data.edit42;
-listName = data.edit59.String;
+listName = data.edit58.String;
 
 deconv_filter_all_abs(dir.String, str2double(pixSize.String), str2double(defocus.String))
 newstar = strrep(listName, '.star', 'filt.star');
@@ -1089,29 +1089,6 @@ function edit57_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function edit57_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit57 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit59_Callback(hObject, eventdata, handles)
-% hObject    handle to edit59 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit59 as text
-%        str2double(get(hObject,'String')) returns contents of edit59 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit59_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit59 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
