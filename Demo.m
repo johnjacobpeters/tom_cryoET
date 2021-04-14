@@ -1021,7 +1021,7 @@ boxsize = str2double(data.edit55.String);
 if exist(newstar)==2
     system(['rm ',newstar]);
 end
-system(['sed s+',dir, '+',out,'+g ', listName, ' > ',newstar])
+system(['sed s+',dir, '+',out,'+g ', listName, ' > ',newstar]);
 rotate_subtomos(listName, dir, out,pxsz,boxsize)
 disp(strcat('Done. Creating new star file: ', newstar))
 
