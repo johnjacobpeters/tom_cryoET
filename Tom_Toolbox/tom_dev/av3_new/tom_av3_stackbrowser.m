@@ -757,7 +757,6 @@ function render_image()
 global storage_av3_stackbrowser;
 
 storage_av3_stackbrowser.fontsize = 12;
-disp(storage_av3_stackbrowser.numcols);
 %bandpass filter
  
 %if(~get(findobj('Tag','constant_scale'),'Value')) % always the same scale
