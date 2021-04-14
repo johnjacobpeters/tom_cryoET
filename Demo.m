@@ -175,7 +175,7 @@ newstar = strrep(listName, '.star', 'reextract.star');
 if exist(newstar)==2
     system(['rm ',newstar]);
 end
-system(['sed s+',dir, '+',out,'+g ', listName, ' > ',newstar])
+system(['sed s+',dir, '+',out,'+g ', listName, ' > ',newstar]);
 disp(strcat('Done. Creating new star file: ', newstar))
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
