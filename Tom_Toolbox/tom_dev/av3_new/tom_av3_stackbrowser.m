@@ -59,9 +59,7 @@ end
 function tom_av3_stackbrowser_OpeningFcn(hObject, eventdata, handles, varargin)
 
 global storage_av3_stackbrowser;
-
 axes(findobj('Tag','av3_stackbrowser_particles'));axis off;
-
 storage_av3_stackbrowser.numcols = 10;
 storage_av3_stackbrowser.numrows = 10;
 storage_av3_stackbrowser.resamplezval = 16;
@@ -72,11 +70,11 @@ storage_av3_stackbrowser.bandpass.low = 0;
 storage_av3_stackbrowser.bandpass.enable = 0;
 storage_av3_stackbrowser.orientation = 'xy';
 
-storage_av3_stackbrowser.display.marks = 1;
+storage_av3_stackbrowser.display.marks = 0;
 storage_av3_stackbrowser.display.ccc = 1;
-storage_av3_stackbrowser.display.quality = 1;
-storage_av3_stackbrowser.display.classno = 1;
-storage_av3_stackbrowser.display.projclassno = 1;
+storage_av3_stackbrowser.display.quality = 0;
+storage_av3_stackbrowser.display.classno = 0;
+storage_av3_stackbrowser.display.projclassno = 0;
 
 storage_av3_stackbrowser.refstep = 0;
 storage_av3_stackbrowser.page = 0;
@@ -98,6 +96,16 @@ end
 %open the alignment file
 s = load(storage_av3_stackbrowser.alignfile);
 storage_av3_stackbrowser.align = s.Align;
+a= storage_av3_stackbrowser.align;
+global filenamedisp2;
+for i =1:length(s.Align)
+    filenamedisp2(i).name=cell2mat({s.Align(i).Filename});
+end
+% for i=1:length(a)
+%     e(i) = a(i,:).Filename
+% end
+
+
 
 if ~isfield(storage_av3_stackbrowser.align,'quality')
     for i=1:size(storage_av3_stackbrowser.align,2)
@@ -755,6 +763,7 @@ end
 function render_image()
 
 global storage_av3_stackbrowser;
+global filenamedisp2;
 
 storage_av3_stackbrowser.fontsize = 12;
 %bandpass filter
@@ -791,9 +800,9 @@ if storage_av3_stackbrowser.display.ccc == 1
             else
                 refstep = storage_av3_stackbrowser.refstep;
             end
-            cccval = storage_av3_stackbrowser.align(refstep,abspartnumber).CCC;
+            cccval = filenamedisp2(abspartnumber).name
             pos_x = storage_av3_stackbrowser.imsize(1).*0.4;
-            t = text(pos_x,pos_y,sprintf('%0.2f',double(cccval)));
+            t = text(pos_x,pos_y,cccval);
             set(t,'Tag','cccstring2','Color',[1 1 0],'FontSize',storage_av3_stackbrowser.fontsize,'FontWeight','bold');
         end
     end
@@ -851,7 +860,7 @@ if storage_av3_stackbrowser.display.projclassno == 1
             else
                 refstep = storage_av3_stackbrowser.refstep;
             end
-            cccval = storage_av3_stackbrowser.align(refstep,abspartnumber).ProjectionClass;
+            cccval = storage_av3_stackbrowser.align(refstep,abspartnumber).Filename;
             pos_x = storage_av3_stackbrowser.imsize(1).*1.2;
             t = text(pos_x,pos_y,sprintf('%0.0f',double(cccval)));
             set(t,'Tag','cccstring2','Color',[1 1 0],'FontSize',storage_av3_stackbrowser.fontsize,'FontWeight','bold');
