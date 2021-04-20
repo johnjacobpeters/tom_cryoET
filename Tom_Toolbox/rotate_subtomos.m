@@ -1,18 +1,17 @@
 %% unlike another script, this one cut the particle from the particles not tomograms, which induced interpolation. 
 % adjusted for relion (crt f 2.62)
-function []=rotate_subtomos(listName, dir, out,pxsz,boxsize)
+function []=rotate_subtomos(listName, dir, out,pxsz,boxsize, shifton)
 
 output.findWhat = dir;
 output.rplaceWith{1}=out;
-
 
 %% Code
 [fileNames,angles,shifts,list,PickPos]=readList(listName, pxsz);
 
 waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
-%angles(:,1:5)'*-1;
+angles(:,1:5)'*-1;
 parfor i=1:length(fileNames)
-    [outH1]=processParticle(fileNames{i},angles(:,i)'*-1, boxsize);
+    [outH1]=processParticle(fileNames{i},angles(:,i)'*-1, boxsize, shifts(:,i)'*-1, shifton);
     writeParticle(fileNames{i},outH1, output);
     waitbar.update;
 end;
@@ -46,10 +45,13 @@ if (strcmp(ext,'.star'))
 end;
 disp(' ');
 
-function [outH1]=processParticle(filename,tmpAng, boxsize)
+function [outH1]=processParticle(filename,tmpAng, boxsize, shifts, shifton)
 
 volTmp=tom_mrcread(filename); volTmp=volTmp.Value;
 outH1=tom_shift(tom_rotate(volTmp,tmpAng,'linear'),[0 0 0]);
+if shifton ==1
+    outH1=tom_shift(outH1,shifts); 
+end
 topLeft = [0 0 0];
 outH1 = tom_cut_out(outH1,topLeft,[boxsize boxsize boxsize]);
 
