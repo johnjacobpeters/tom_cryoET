@@ -48,13 +48,18 @@ disp(' ');
 function [outH1]=processParticle(filename,tmpAng, boxsize, shifts, shifton)
 
 volTmp=tom_mrcread(filename); volTmp=volTmp.Value;
-outH1=tom_shift(tom_rotate(volTmp,tmpAng,'linear'),[0 0 0]);
 if shifton ==1
-    outH1=tom_shift(outH1,shifts); 
+    outH1=tom_shift(volTmp,shifts);
+    outH1=tom_rotate(outH1,tmpAng,'linear');
+    %boxsize = round(boxsize*.75);
+else
+    outH1=tom_rotate(volTmp,tmpAng,'linear');
 end
-topLeft = [0 0 0];
-outH1 = tom_cut_out(outH1,topLeft,[boxsize boxsize boxsize]);
 
+topLeft = [0 0 0];
+
+
+outH1 = tom_cut_out(outH1,topLeft,[boxsize boxsize boxsize]);
 
 
 
