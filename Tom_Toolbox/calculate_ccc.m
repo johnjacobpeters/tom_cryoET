@@ -6,10 +6,10 @@ volume = volume.Value;
 cccvalue=[];
 tmpVol = [];
 for i=1:length(fileNames)
-    disp(fileNames{i})
+    %disp(fileNames{i})
     tmpVol = tom_mrcread(fileNames{i});
     tmpVol = tmpVol.Value;
-    cccvalue(i)=tom_ccc(tmpVol,volume)
+    cccvalue(i)=tom_ccc(tmpVol,volume);
 end
 
 
