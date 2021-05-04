@@ -9,7 +9,7 @@ for i=1:length(fileNames)
     %disp(fileNames{i})
     tmpVol = tom_mrcread(fileNames{i});
     tmpVol = tmpVol.Value;
-    cccvalue(i)=tom_ccc(tmpVol,volume,'normal');
+    cccvalue(i)=tom_ccc(tmpVol,volume);
 end
 cccvalue=cccvalue';
 
