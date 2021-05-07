@@ -91,5 +91,5 @@ ind_std = std2(in(indd));
 indd2 = find(in(indd)>(ind_mean+std2fil*ind_std));
 in(indd(indd2)) = in(indd(indd2))-std2shift*ind_std;
 
-%indd2 = find(in(indd)<(ind_mean-std2fil*ind_std));
-%in(indd(indd2)) = in(indd(indd2))+std2shift*ind_std;
+indd2 = find(in(indd)<(ind_mean-std2fil*ind_std));
+in(indd(indd2)) = in(indd(indd2))+std2shift*ind_std;
