@@ -1,6 +1,6 @@
 %% unlike another script, this one cut the particle from the particles not tomograms, which induced interpolation. 
 % adjusted for relion (crt f 2.62)
-function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz, filter, grow)
+function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz, filter, grow, normalizeit, sdRange, sdShift)
 
 %maskName_h1='20210309erasecln.mrc';
 %listName='20210201_201810XX_ZYZ.star';
@@ -9,7 +9,6 @@ function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz
 %listName='20210201_201909_ZYZ.star';
 %listName='20210201_20191105_ZYZcor226.star';
 %listName='20210201_20191108_ZYZ.star';
-
 %output.findWhat='Extract/extract_test/201810XX_MPI/';
 %output.findWhat='Extract/extract_test/20190321_MPI/';
 %output.findWhat='Extract/extract_test/20190611_MPI/';
@@ -34,7 +33,7 @@ maskh1=tom_mrcread(maskName_h1); maskh1=maskh1.Value;
 
 waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
 parfor i=1:length(fileNames)
-    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsize,filter,grow);
+    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsize,filter,grow, normalizeit, sdRange, sdShift);
     writeParticle(fileNames{i},outH1, output);
     waitbar.update;
 end;
@@ -62,8 +61,8 @@ for ii=1:length(output.rplaceWith)
         tom_starwrite([ b '_cut_right' num2str(ii) c],listNew);
     else
         tom_starwrite([a filesep b '_cut' num2str(ii) c],listNew);
-    end;
-end;
+    end
+end
 
 
 
@@ -90,7 +89,7 @@ if (strcmp(ext,'.star'))
 end;
 disp(' ');
 
-function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsize, filter,grow)
+function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsize, filter,grow, normalizeit, sdRange, sdShift)
 
 volTmp=tom_mrcread(filename); volTmp=volTmp.Value;
 maskh1Trans=tom_shift(tom_rotate(maskh1,tmpAng),tmpShift');
@@ -109,12 +108,12 @@ topLeft = [0 0 0];
 %outH1=tom_maskWithNoise(volTmp,maskh1Trans,-15,1);
 
 %cut and filter
-outH1=tom_maskWithFil(volTmp,maskh1Trans, 2, 1);
+outH1=tom_maskWithFil(volTmp,maskh1Trans, sdRange, sdShift);
 if filter == 1
     outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
 end
 outH1 = tom_cut_out(outH1,topLeft,boxsize);
-if normalize == 1
+if normalizeit == 1
     outH1 = normalize(outH1);
 end
 
