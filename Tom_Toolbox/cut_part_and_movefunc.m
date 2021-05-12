@@ -114,6 +114,10 @@ if filter == 1
     outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
 end
 outH1 = tom_cut_out(outH1,topLeft,boxsize);
+if normalize == 1
+    outH1 = normalize(outH1);
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %vectTrans=tom_pointrotate(offSetCenter,tmpAng(1),tmpAng(2),tmpAng(3))+tmpShift';
 
