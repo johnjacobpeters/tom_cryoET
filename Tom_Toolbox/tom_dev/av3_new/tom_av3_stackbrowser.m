@@ -800,7 +800,7 @@ if storage_av3_stackbrowser.display.ccc == 1
             else
                 refstep = storage_av3_stackbrowser.refstep;
             end
-            cccval = filenamedisp2(abspartnumber).name
+            cccval = filenamedisp2(abspartnumber).name;
             pos_x = storage_av3_stackbrowser.imsize(1).*0.4;
             t = text(pos_x,pos_y,cccval);
             set(t,'Tag','cccstring2','Color',[1 1 0],'FontSize',storage_av3_stackbrowser.fontsize,'FontWeight','bold');
