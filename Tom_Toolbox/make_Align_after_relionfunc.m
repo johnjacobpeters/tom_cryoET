@@ -3,9 +3,9 @@
 
 function make_Align_after_relionfunc(stackstar, pxsz)
 starName = stackstar; %star file need to be checked
-list=tom_starreadrel3(starName) ;
+list=tom_starreadrel3(starName);
 matfile_align = './Align.mat'; % output Align file 
-%creat empty Align file
+%create empty Align file
 run=1;
 for i=1:length(list)
     Align(run,i).Filename = '';
@@ -54,7 +54,7 @@ end
         Align(1,i).Shift.Z = shifts(3,i)/pxsz;
         %Align(1,i).CCC = list(i).rlnLogLikeliContribution; 
         Align(1,i).CTFname = list(i).rlnCtfImage; % test,ctf file information
-    end;
+    end
    
         save(matfile_align,'Align');
         dc_particles(list); 
