@@ -108,9 +108,12 @@ topLeft = [0 0 0];
 %outH1=tom_maskWithNoise(volTmp,maskh1Trans,-15,1);
 
 %cut and filter
-outH1=tom_maskWithFil(volTmp,maskh1Trans, sdRange, sdShift);
+
 if filter == 1
+    outH1=tom_maskWithFil(volTmp,maskh1Trans, sdRange, sdShift);
     outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
+else
+    outH1=tom_permute_bg(volTmp,maskh1Trans,'',grow,5,3);
 end
 outH1 = tom_cut_out(outH1,topLeft,boxsize);
 if normalizeit == 1
