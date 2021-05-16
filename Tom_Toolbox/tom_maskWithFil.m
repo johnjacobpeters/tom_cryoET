@@ -1,4 +1,4 @@
-function in=tom_maskWithFil(in,mask,std2fil, std2shift)
+function in=tom_maskWithFil(in,mask,std2fil, std2shift,blackdust,whitedust)
 %TOM_MASKWITHNOISE replaces pixels outside mask with noise
 %   
 %
@@ -88,8 +88,11 @@ indd=find(mask < 0.1);
 ind_mean = mean2(in(indd));
 ind_std = std2(in(indd));
 
-indd2 = find(in(indd)>(ind_mean+std2fil*ind_std));
-in(indd(indd2)) = in(indd(indd2))-std2shift*ind_std;
-
-indd2 = find(in(indd)<(ind_mean-std2fil*ind_std));
-in(indd(indd2)) = in(indd(indd2))+std2shift*ind_std;
+if whitedust==1
+    indd2 = find(in(indd)>(ind_mean+std2fil*ind_std));
+    in(indd(indd2)) = in(indd(indd2))-std2shift*ind_std;
+end
+if blackdust==1
+    indd2 = find(in(indd)<(ind_mean-std2fil*ind_std));
+    in(indd(indd2)) = in(indd(indd2))+std2shift*ind_std;
+end

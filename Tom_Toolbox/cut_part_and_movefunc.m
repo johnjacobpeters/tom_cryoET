@@ -1,6 +1,6 @@
 %% unlike another script, this one cut the particle from the particles not tomograms, which induced interpolation. 
 % adjusted for relion (crt f 2.62)
-function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz, filter, grow, normalizeit, sdRange, sdShift)
+function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz, filter, grow, normalizeit, sdRange, sdShift,blackdust,whitedust)
 
 %maskName_h1='20210309erasecln.mrc';
 %listName='20210201_201810XX_ZYZ.star';
@@ -33,7 +33,7 @@ maskh1=tom_mrcread(maskName_h1); maskh1=maskh1.Value;
 
 waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
 parfor i=1:length(fileNames)
-    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsize,filter,grow, normalizeit, sdRange, sdShift);
+    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsize,filter,grow, normalizeit, sdRange, sdShift,blackdust,whitedust);
     writeParticle(fileNames{i},outH1, output);
     waitbar.update;
 end;
@@ -89,7 +89,7 @@ if (strcmp(ext,'.star'))
 end;
 disp(' ');
 
-function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsize, filter,grow, normalizeit, sdRange, sdShift)
+function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsize, filter,grow, normalizeit, sdRange, sdShift,blackdust,whitedust)
 
 volTmp=tom_mrcread(filename); volTmp=volTmp.Value;
 maskh1Trans=tom_shift(tom_rotate(maskh1,tmpAng),tmpShift');
@@ -110,7 +110,7 @@ topLeft = [0 0 0];
 %cut and filter
 
 if filter == 1
-    outH1=tom_maskWithFil(volTmp,maskh1Trans, sdRange, sdShift);
+    outH1=tom_maskWithFil(volTmp,maskh1Trans, sdRange, sdShift,blackdust,whitedust);
     outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
 else
     outH1=tom_permute_bg(volTmp,maskh1Trans,'',grow,5,3);
