@@ -8,6 +8,7 @@ function out=tom_permute_bg(in,mask,outputname,grow_rate,num_of_steps,filt_cer,m
 %  mask
 %  
 %
+%
 %PARAMETERS
 %
 %  INPUT
