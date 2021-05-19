@@ -9,7 +9,6 @@ output.rplaceWith{1}=out;
 [fileNames,angles,shifts,list,PickPos]=readList(listName, pxsz);
 
 waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
-angles(:,1:5)'*-1;
 parfor i=1:length(fileNames)
     [outH1]=processParticle(fileNames{i},angles(:,i)'*-1, boxsize, shifts(:,i)'*-1, shifton);
     writeParticle(fileNames{i},outH1, output);
