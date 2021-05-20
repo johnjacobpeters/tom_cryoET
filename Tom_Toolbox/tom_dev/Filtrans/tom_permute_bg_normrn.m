@@ -1,4 +1,4 @@
-function out=tom_permute_bg(in,mask,outputname,grow_rate,num_of_steps,filt_cer,max_error)
+function out=tom_permute_bg_normrn(in,mask,outputname,grow_rate,num_of_steps,filt_cer,max_error)
 %TOM_PERMUTE_BG premutes background pixels
 %   
 %
@@ -102,23 +102,38 @@ end;
 if (grow_rate==0)
     outmask=find(mask<0.1);
     inmask=find(mask>=0.1);
-    for i=1:length(outmask)
-        in(outmask(i))=normrnd(0,1);
-    end
-    in(inmask)=normalize(in(inmask));
-    insmall=find(in(inmask)<0);
+    
+    outsmall=find(in(outmask)<-.5);
+    insmall=find(in(inmask)<-1.5);
+    allsmall=find(in<-.5);
+    outlarge=find(in(outmask)>1.5);
+%     for i=1:length(allsmall)    
+%         in(allsmall(i))=normrnd(0,1);
+%     end
+    for i=1:length(outlarge)    
+        in(outmask(outlarge(i)))=normrnd(0,1);
+    end 
     for i=1:length(insmall)    
         in(inmask(insmall(i)))=normrnd(0,1);
-    end
+    end  
+%     for i=1:length(outmask)
+%         in(outmask(i))=normrnd(0,1);
+%     end
+
+    %in(inmask)=normalize(in(inmask));
+%     insmall=find(in(inmask)<0);
+%     for i=1:length(insmall)    
+%         in(inmask(insmall(i)))=normrnd(0,1);
+%     end
     %in(inmask)=normalize(in(inmask));
     %in=normalize(in);
-    inmax=max(in(:));
-    inmin=min(in(:));
-    range=inmax-inmin;
-    in=((in-inmin)/range-.5)*2;
-    %indd=find(mask < 0.1);
-    %ind_rand=randperm(length(indd));
-    %in(indd)=in(indd(ind_rand));
+%     inmax=max(in(:));
+%     inmin=min(in(:));
+%     range=inmax-inmin;
+%     in=((in-inmin)/range-.5)*2;
+    indd=find(mask < 0.1);
+    ind_rand=randperm(length(indd));
+    in(indd)=in(indd(ind_rand));
 else
     
     mask_tmp=mask;

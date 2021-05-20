@@ -97,7 +97,7 @@ end;
 
 if (isstruct(mask))
     mask=mask.Value;
-end;
+end
 
 if (grow_rate==0)
     outmask=find(mask<0.1);
@@ -116,8 +116,8 @@ if (grow_rate==0)
         end
     end
     if blackdust == 1
-        for i=1:length(insmall)
-            in(inmask(insmall(i)))=normrnd(0,1);
+        for i=1:length(outsmall)
+            in(outmask(outsmall(i)))=normrnd(0,1);
         end  
     end
 %     for i=1:length(outmask)
