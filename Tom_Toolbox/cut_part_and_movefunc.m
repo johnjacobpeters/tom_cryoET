@@ -1,6 +1,6 @@
 %% unlike another script, this one cut the particle from the particles not tomograms, which induced interpolation. 
 % adjusted for relion (crt f 2.62)
-function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz, filter, grow, normalizeit, sdRange, sdShift,blackdust,whitedust)
+function []=cut_part_and_movefunc(maskName_h1, listName, dir, out, boxsize, pxsz, filter, grow, normalizeit, sdRange, sdShift,blackdust,whitedust,shiftfil,randfilt,permutebg)
 
 %maskName_h1='20210309erasecln.mrc';
 %listName='20210201_201810XX_ZYZ.star';
@@ -33,10 +33,10 @@ maskh1=tom_mrcread(maskName_h1); maskh1=maskh1.Value;
 
 waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
 parfor i=1:length(fileNames)
-    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsize,filter,grow, normalizeit, sdRange, sdShift,blackdust,whitedust);
+    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsize,filter,grow, normalizeit, sdRange, sdShift,blackdust,whitedust,shiftfil,randfilt,permutebg);
     writeParticle(fileNames{i},outH1, output);
     waitbar.update;
-end;
+end
 waitbar.close();
 
 %genStarFiles(list,listName,output, posNew);
@@ -56,7 +56,7 @@ for ii=1:length(output.rplaceWith)
        listNew(i).rlnCoordinateX = newPos(1,i);
        listNew(i).rlnCoordinateY = newPos(2,i);
        listNew(i).rlnCoordinateZ = newPos(3,i);
-    end;
+    end
     if (isempty(a))
         tom_starwrite([ b '_cut_right' num2str(ii) c],listNew);
     else
@@ -85,11 +85,11 @@ if (strcmp(ext,'.star'))
         Align(1,i).Shift.X = shifts(1,i); %Shift of particle, will be filled by tom_av3_extract_anglesshifts
         Align(1,i).Shift.Y = shifts(2,i);
         Align(1,i).Shift.Z = shifts(3,i);
-    end;
-end;
+    end
+end
 disp(' ');
 
-function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsize, filter,grow, normalizeit, sdRange, sdShift,blackdust,whitedust)
+function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsize, filter,grow, normalizeit, sdRange, sdShift,blackdust,whitedust,shiftfil,randfilt,permutebg)
 
 volTmp=tom_mrcread(filename); volTmp=volTmp.Value;
 maskh1Trans=tom_shift(tom_rotate(maskh1,tmpAng),tmpShift');
@@ -108,18 +108,32 @@ topLeft = [0 0 0];
 %outH1=tom_maskWithNoise(volTmp,maskh1Trans,-15,1);
 
 %cut and filter
-
+outH1=volTmp;
 if filter == 1
-    outH1=tom_maskWithFil(volTmp,maskh1Trans, sdRange, sdShift,blackdust,whitedust);
+    if shiftfil == 1
+        outH1=tom_maskWithFil(outH1,maskh1Trans, sdRange, sdShift,blackdust,whitedust);
+    elseif randfilt == 1
+        outH1=tom_randnoise_filt(outH1,maskh1Trans,'',0,sdRange,blackdust,whitedust);
+    end
+end    
+if permutebg == 1
     outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
-else
-    outH1=tom_permute_bg(volTmp,maskh1Trans,'',grow,5,3);
 end
-outH1 = tom_cut_out(outH1,topLeft,boxsize);
+%outH1 = tom_cut_out(outH1,topLeft,boxsize);
+%outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
 if normalizeit == 1
-    outH1 = normalize(outH1);
+    %outH1 = normalize(outH1);
+    in = outH1;
+    inmax=max(in(:));
+    inmin=min(in(:));
+    range=inmax-inmin;
+    in=((in-inmin)/range-.5)*2;
+    indd=find(maskh1Trans < 0.1);
+    ind_rand=randperm(length(indd));
+    in(indd)=in(indd(ind_rand));
+    outH1 = in;
 end
-
+%outH1=tom_permute_bg(outH1,maskh1Trans,'',grow,5,3);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %vectTrans=tom_pointrotate(offSetCenter,tmpAng(1),tmpAng(2),tmpAng(3))+tmpShift';
 
@@ -151,7 +165,7 @@ warning off; mkdir(pFoldLeft); warning on;
 
 if (strcmp(nameLeft,filename))
     error(['check output find what: ' filename ' == ' nameLeft])
-end;
+end
 
 
 
