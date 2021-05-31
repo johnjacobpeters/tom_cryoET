@@ -1,4 +1,4 @@
-function [  ] = deconv_filter_all(myDir, pixSize, defocus)
+function [  ] = deconv_filter_all(myDir, pixSize, defocus, snrratio)
 
 % Parameters:
 % myDir - directory containing folders with subtomograms
@@ -16,7 +16,7 @@ for i= 1:length(mySubDirs)
              fullFileName = fullfile(myDir, mySubDirs(i).name, '/', baseFileName);
              fprintf(1, 'Now filtering %s\n', fullFileName);
              new_sub=tom_mrcread(fullFileName);
-             subtomo_filt=tom_deconv_tomo_abs(new_sub.Value,pixSize,defocus,1.2,.01);
+             subtomo_filt=tom_deconv_tomo_abs(new_sub.Value,pixSize,defocus,snrratio,.01);
 
              [folder, baseFileName, extension] = fileparts(fullFileName);
              newFileName=strcat(folder, '/', baseFileName, '_filt.mrc');
