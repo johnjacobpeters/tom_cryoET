@@ -1,7 +1,7 @@
-function varargout = tom_av3_stackbrowser(varargin)
-%TOM_AV3_STACKBROWSER is a GUI for browsing 3D particle stacks
+function varargout = tom_av3_stackbrowser_2(varargin)
+%TOM_AV3_STACKBROWSER_2 is a GUI for browsing 3D particle stacks
 %
-%   varargout = tom_av3_stackbrowser(varargin)
+%   varargout = tom_av3_stackbrowser_2(varargin)
 %
 %PARAMETERS
 %
@@ -12,7 +12,7 @@ function varargout = tom_av3_stackbrowser(varargin)
 %   varargout           ...
 %
 %EXAMPLE
-%   ... = tom_av3_stackbrowser(...);
+%   ... = tom_av3_stackbrowser_2(...);
 %   creates ...
 %
 %REFERENCES
@@ -37,8 +37,8 @@ function varargout = tom_av3_stackbrowser(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @tom_av3_stackbrowser_OpeningFcn, ...
-                   'gui_OutputFcn',  @tom_av3_stackbrowser_OutputFcn, ...
+                   'gui_OpeningFcn', @tom_av3_stackbrowser_2_OpeningFcn, ...
+                   'gui_OutputFcn',  @tom_av3_stackbrowser_2_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -56,7 +56,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Opening Function                                                   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function tom_av3_stackbrowser_OpeningFcn(hObject, eventdata, handles, varargin)
+function tom_av3_stackbrowser_2_OpeningFcn(hObject, eventdata, handles, varargin)
 
 global storage_av3_stackbrowser;
 axes(findobj('Tag','av3_stackbrowser_particles'));axis off;
@@ -87,7 +87,7 @@ if size(varargin,1) == 0
         error('Cancel button pressed. No data loaded.');
         return;
     end;
-    storage_av3_stackbrowser.alignfile = [pathname '/' filename];
+    storage_av3_stackbrowser.alignfile = [pathname, filename];
 else
     storage_av3_stackbrowser.alignfile = varargin{1};
 end
@@ -149,20 +149,20 @@ set(findobj('Tag','menu_av3_stackbrowser_refstep'),'String',refstring);
 loadstack(1);
 render_image();
 
-% Choose default command line output for tom_av3_stackbrowser
+% Choose default command line output for tom_av3_stackbrowser_2
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes tom_av3_stackbrowser wait for user response (see UIRESUME)
+% UIWAIT makes tom_av3_stackbrowser_2 wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Output Function                                                    %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = tom_av3_stackbrowser_OutputFcn(hObject, eventdata, handles) 
+function varargout = tom_av3_stackbrowser_2_OutputFcn(hObject, eventdata, handles) 
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
@@ -471,7 +471,7 @@ function button_av3_stackbrowser_saveselection_Callback(hObject, eventdata, hand
 
 global storage_av3_stackbrowser;
 
-storage_av3_stackbrowser.quality = str2num(get(findobj('Tag','input_av3_stackbrowser_newquality'),'String'));
+storage_av3_stackbrowser.quality = 5;
 
 j = size(storage_av3_stackbrowser.align,1);
 for i=1:size(storage_av3_stackbrowser.align,2)
@@ -487,14 +487,87 @@ outfile = storage_av3_stackbrowser.alignfile;
 if isempty(outfile)
     [filename, pathname] = uigetfile({'*.em'}, 'Pick an output alignment file');
     if ischar(filename)
-        outfile = [pathname '/' filename];
+        outfile = [pathname, filename];
         save(outfile,'Align');
     end
 else
+    outfile = strrep(outfile, '.mat', 'temp.mat');
     save(outfile,'Align');
 end
 disp(outfile)
 disp('Alignment File saved.');
+
+% outdir = get(findobj('Tag','input_av3_stackbrowser_outdir'),'String');
+% outalign = get(findobj('Tag','input_av3_stackbrowser_outalign'),'String');
+% value = 7;
+% 
+% contents = 'quality';
+% fieldname = 'quality';
+% 
+% contents = '==';
+% operator = '==';
+% 
+% if isempty(outdir)
+%     errordlg('Select output directory name!');
+%     return;
+% end
+% 
+% if isempty(outalign)
+%     errordlg('Select output alignment file name!');
+%     return;
+% end
+% 
+% if isempty(operator)
+%     errordlg('Input a relational operator!');
+%     return;
+% end
+% 
+% if isempty(operator)
+%     errordlg('Input a relational operator!');
+%     return;
+% end
+% 
+% if isempty(fieldname)
+%     errordlg('Input a fieldname!');
+%     return;
+% end
+% 
+% if isempty(value)
+%     errordlg('Input a value!');
+%     return;
+% end
+% 
+% if ~exist(outdir,'dir')
+%     mkdir(outdir);
+% end
+% 
+% %Align = struct();
+% al = storage_av3_stackbrowser.align;
+% al(1,size(al,2)).Tempfilename = '';
+% al = rmfield(al,'partno');
+% al = rmfield(al,'selected');
+% lauf=1;
+% j = size(storage_av3_stackbrowser.align,1);
+% for k=1:size(storage_av3_stackbrowser.align,2)
+%     t = eval(['storage_av3_stackbrowser.align(j,k).(fieldname) ' operator ' value;']);
+%     if t==1
+%        for h=1:j
+%            Align(h,lauf) = al(h,k);
+%        end
+%        
+%        [pathstr, name, ext] = fileparts(al(j,k).Filename);
+%        
+%        %unix(['cp ' al(j,k).Filename ' ' outdir '/particle_' num2str(lauf) ext]);
+%        
+%        Align(j,lauf).Tempfilename = al(j,k).Filename;
+%        Align(j,lauf).Filename = [outdir '/particle_' num2str(lauf) ext];
+%        Align(j,lauf).Filename = Align(j,lauf).Tempfilename ;
+%        lauf=lauf+1; 
+%     end
+% end
+% save(outalign,'Align')
+% 
+% disp('finished ');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -526,15 +599,15 @@ function button_av3_stackbrowser_filterstack_Callback(hObject, eventdata, handle
 
 global storage_av3_stackbrowser;
 
-outdir = get(findobj('Tag','input_av3_stackbrowser_outdir'),'String');
-outalign = get(findobj('Tag','input_av3_stackbrowser_outalign'),'String');
-value = str2num(get(findobj('Tag','input_av3_stackbrowser_filterval'),'String'));
+outdir = get(findobj('Tag','input_av3_stackbrowser_outdir'),'String')
+outalign = get(findobj('Tag','input_av3_stackbrowser_outalign'),'String')
+value = 5;
+instar = get(findobj('Tag','input_av3_stackbrowser_instar'),'String')
+%contents = 'quality';
+fieldname = 'quality';
 
-contents = get(findobj('Tag','menu_av2_stackbrowser_filterfield'),'String')
-fieldname = contents{get(findobj('Tag','menu_av2_stackbrowser_filterfield'),'Value')}
-
-contents = get(findobj('Tag','menu_av2_stackbrowser_filteroperator'),'String');
-operator = contents{get(findobj('Tag','menu_av2_stackbrowser_filteroperator'),'Value')}
+%contents = '==';
+operator = '~=';
 
 if isempty(outdir)
     errordlg('Select output directory name!');
@@ -594,9 +667,17 @@ for k=1:size(storage_av3_stackbrowser.align,2)
        lauf=lauf+1; 
     end
 end
-save(outalign,'Align')
+save(strrep(outalign,'.star','.mat'),'Align')
+for w = 1:length(Align)
+    Align(w).Filename=strrep(Align(w).Filename, '.em', '');
+    Align(w).Filename=strrep(Align(w).Filename, '/', '\/');
+end
+system(['cp ' ' instar ' ' outalign'])
+for x = 1:length(Align)
+   % system(['sed -i '''' ' '''' '/'  Align(x).Filename '/d' ''' ' 'testmini.star']);
+end
 
-disp(' ');
+disp(' Star file saved ');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1095,3 +1176,37 @@ function constant_scale_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of constant_scale
+
+
+
+function input_av3_stackbrowser_instar_Callback(hObject, eventdata, handles)
+% hObject    handle to input_av3_stackbrowser_instar (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of input_av3_stackbrowser_instar as text
+%        str2double(get(hObject,'String')) returns contents of input_av3_stackbrowser_instar as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function input_av3_stackbrowser_instar_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to input_av3_stackbrowser_instar (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton17.
+function pushbutton17_Callback(hObject, eventdata, handles)
+pathname = uigetdir('Pick an input star file');
+if ischar(pathname)
+    set(findobj('Tag','input_av3_stackbrowser_instar'),'String',pathname);
+end
+% hObject    handle to pushbutton17 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
