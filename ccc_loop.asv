@@ -1,4 +1,4 @@
-function [cccval] = ccc_loop(starfile, cccvol1in)
+function [cccval] = ccc_loop(starfile, cccvol1in, threshold)
 % star file and mask name
 %starfile = 'testmini.star';
 outputstar = strrep(starfile, '.star','_out.star');
@@ -8,11 +8,11 @@ invol1 = tom_mrcread(cccvol1in);
 invol1 = invol1.Value;
 
 % create output star and add ccc value
-system(['cp ' starfile  ' ' strrep(starfile,'.star','_ccc.star')]);
-system('tail -3 testmini.star > test2mini.star');
-[status,columnNum] = system ('awk ''{print NF; exit}'' test2mini.star');
-columnNum = columnNum +1;
-% system([
+% system(['cp ' starfile  ' ' strrep(starfile,'.star','_ccc.star')]);
+% system('tail -3 testmini.star > test2mini.star');
+% [status,columnNum] = system ('awk ''{print NF; exit}'' test2mini.star');
+% columnNum = columnNum +1;
+%  system([
 
 % looping through each mrc, apply rots and shift, calculating ccc
 cccval = zeros(length(inputstar),1);
@@ -26,7 +26,7 @@ for i= 1:length(inputstar)
     rotVol = tom_rotate(shiftVol,rotateOut,'linear');
     cccval(i)=tom_ccc(invol1,rotVol,'norm');
 end
-threshold = 0.1;
+%threshold = 0.1;
 removeList = find(cccval<threshold);
 
 system(['cp ' starfile ' ' outputstar]);

@@ -8,11 +8,11 @@ invol1 = tom_mrcread(cccvol1in);
 invol1 = invol1.Value;
 
 % create output star and add ccc value
-system(['cp ' starfile  ' ' strrep(starfile,'.star','_ccc.star')]);
-system('tail -3 testmini.star > test2mini.star');
-[status,columnNum] = system ('awk ''{print NF; exit}'' test2mini.star');
-columnNum = columnNum +1;
-% system([
+% system(['cp ' starfile  ' ' strrep(starfile,'.star','_ccc.star')]);
+% system('tail -3 testmini.star > test2mini.star');
+% [status,columnNum] = system ('awk ''{print NF; exit}'' test2mini.star');
+% columnNum = columnNum +1;
+%  system([
 
 % looping through each mrc, apply rots and shift, calculating ccc
 cccval = zeros(length(inputstar),1);
