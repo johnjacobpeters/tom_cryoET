@@ -1,4 +1,4 @@
-function [cccval] = ccc_loop(starfile, cccvol1in, threshold)
+function [cccval] = ccc_loop(starfile, cccvol1in, threshold, boxsize, zoomrange)
 % star file and mask name
 %starfile = 'testmini.star';
 outputstar = strrep(starfile, '.star','_out.star');
@@ -24,7 +24,7 @@ for i= 1:length(inputstar)
     rotateOut = [inputstar(i).rlnAngleRot, inputstar(i).rlnAngleTilt, inputstar(i).rlnAnglePsi]*-1;
     shiftVol = tom_shift(invol2,shiftOut');
     rotVol = tom_rotate(shiftVol,rotateOut,'linear');
-    cccval(i)=tom_ccc(invol1,rotVol,'norm');
+    cccval(i)=tom_ccc(invol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),rotVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
 end
 %threshold = 0.1;
 removeList = find(cccval<threshold);
