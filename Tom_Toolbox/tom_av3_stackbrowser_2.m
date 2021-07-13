@@ -86,7 +86,7 @@ if size(varargin,1) == 0
     if isequal(pathname,0)
         error('Cancel button pressed. No data loaded.');
         return;
-    end;
+    end
     storage_av3_stackbrowser.alignfile = [pathname, filename];
 else
     storage_av3_stackbrowser.alignfile = varargin{1};
@@ -599,10 +599,10 @@ function button_av3_stackbrowser_filterstack_Callback(hObject, eventdata, handle
 
 global storage_av3_stackbrowser;
 
-outdir = get(findobj('Tag','input_av3_stackbrowser_outdir'),'String')
-outalign = get(findobj('Tag','input_av3_stackbrowser_outalign'),'String')
+outdir = get(findobj('Tag','input_av3_stackbrowser_outdir'),'String');
+outalign = get(findobj('Tag','input_av3_stackbrowser_outalign'),'String');
 value = 5;
-instar = get(findobj('Tag','input_av3_stackbrowser_instar'),'String')
+instar = get(findobj('Tag','input_av3_stackbrowser_instar'),'String');
 %contents = 'quality';
 fieldname = 'quality';
 
