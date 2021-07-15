@@ -31,8 +31,8 @@ for i= 1:length(inputstar)
     rotVol = tom_rotate(shiftVol,rotateOut,'linear');
     shiftMw = tom_shift(wwedge, shiftOut');
     rotMw = tom_rotate(shiftMw, rotateOut, 'linear');
-    invol1 = invol1.*rotMw;
-    cccval(i)=tom_ccc(invol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),rotVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
+    mwfixedinvol1 = invol1.*rotMw;
+    cccval(i)=tom_ccc(mwfixedinvol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),rotVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
 end
 %threshold = 0.1;
 removeList = find(cccval<threshold);
