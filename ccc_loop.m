@@ -9,7 +9,7 @@ invol1 = invol1.Value;
 
 wwedge = tom_mrcread(mswedge);
 wwedge = wwedge.Value;
-
+wwedge = 1;
 
 % create output star and add ccc value
 % system(['cp ' starfile  ' ' strrep(starfile,'.star','_ccc.star')]);
@@ -25,14 +25,16 @@ for i= 1:length(inputstar)
     invol2 = tom_mrcread(inputstar(i).rlnImageName);
     invol2 = invol2.Value;
     mwcorrvol2 = invol2.*wwedge;
-    shiftOut = [inputstar(i).rlnOriginXAngst, inputstar(i).rlnOriginYAngst,inputstar(i).rlnOriginZAngst]*-1;
-    rotateOut = [inputstar(i).rlnAngleRot, inputstar(i).rlnAngleTilt, inputstar(i).rlnAnglePsi]*-1;
-    shiftVol = tom_shift(mwcorrvol2,shiftOut');
-    rotVol = tom_rotate(shiftVol,rotateOut,'linear');
+    shiftOut = [inputstar(i).rlnOriginXAngst, inputstar(i).rlnOriginYAngst,inputstar(i).rlnOriginZAngst]/-2.62;
+    rotateOut = [inputstar(i).rlnAnglePsi,inputstar(i).rlnAngleTilt, inputstar(i).rlnAngleRot]*-1;
+    [~,fixedrotations] = tom_eulerconvert_xmipp(rotateOut(1),rotateOut(2),rotateOut(3));
+    rotVol = tom_rotate(mwcorrvol2,fixedrotations,'linear');
+    shiftVol = tom_shift(rotVol,shiftOut');
+    
     shiftMw = tom_shift(wwedge, shiftOut');
     rotMw = tom_rotate(shiftMw, rotateOut, 'linear');
-    mwfixedinvol1 = invol1.*rotMw;
-    cccval(i)=tom_ccc(mwfixedinvol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),rotVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
+    mwfixedinvol1 = invol1; %invol1.*rotMw;
+    cccval(i)=tom_ccc(mwfixedinvol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),shiftVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
 end
 %threshold = 0.1;
 removeList = find(cccval<threshold);
