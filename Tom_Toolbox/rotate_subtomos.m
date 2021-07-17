@@ -40,8 +40,8 @@ if (strcmp(ext,'.star'))
         Align(1,i).Shift.X = shifts(1,i); %Shift of particle, will be filled by tom_av3_extract_anglesshifts
         Align(1,i).Shift.Y = shifts(2,i);
         Align(1,i).Shift.Z = shifts(3,i);
-    end;
-end;
+    end
+end
 disp(' ');
 
 function [outH1]=processParticle(filename,tmpAng, boxsize, shifts, shifton)

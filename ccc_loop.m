@@ -35,7 +35,9 @@ for i= 1:length(inputstar)
     shiftMw = tom_shift(rotMw, shiftOut');
     
     mwfixedinvol1 = invol1.*shiftMw;
-    cccval(i)=tom_ccc(mwfixedinvol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),shiftVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
+    ccf = tom_corr_wedge(wwedge,shiftVol, shiftMw, shiftMw);
+    cccval(i) = sum(sum(sum(ccf(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)))));
+    %cccval(i)=tom_ccc(mwfixedinvol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),shiftVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
 end
 %threshold = 0.1;
 removeList = find(cccval<threshold);

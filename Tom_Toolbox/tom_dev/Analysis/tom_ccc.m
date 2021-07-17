@@ -47,7 +47,7 @@ if (nargin > 2)
         ccc = sum(sum(sum(a.*b)));
     else
         ccc = sum(sum(sum(a.*b)))/sqrt(sum(sum(sum(a.*a)))*sum(sum(sum(b.*b))));
-    end;
+    end
 else
     ccc=(sum(sum(sum(a.*b))))./(size(a,1).*size(a,2).*size(a,3)-1) ;
-end;
+end

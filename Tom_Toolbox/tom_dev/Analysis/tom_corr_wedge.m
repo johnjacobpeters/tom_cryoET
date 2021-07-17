@@ -69,13 +69,13 @@ function ccf=tom_corr_wedge(a,b,wedge_a,wedge_b,flag)
     stdv = sqrt(sum(sum(sum(a.*a)))/n - mn^2); % standard deviation of a
     if (stdv~=0)
         a = (a -mn)/stdv;
-    end;
+    end
 
     mn = sum(sum(sum(b)))/n;
     stdv = sqrt(sum(sum(sum(b.*b)))/n - mn^2);
     if  (stdv~=0)
         b = (b - mn)/stdv;
-    end;
+    end
 
 
 ccf = real(ifftshift(tom_ifourier(tom_fourier(b).*conj(tom_fourier(a)))))/n_all;%perform correlation
