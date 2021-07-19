@@ -45,7 +45,7 @@ for i= 1:length(inputstar)
     mwfixedinvol1 = invol1.*shiftMw;
     
     %%%%%calculate ccf and sum values%%%%%
-    ccf = tom_corr_wedge(wwedge,shiftVol, shiftMw, shiftMw);
+    ccf = tom_corr_wedge(invol1,shiftVol, shiftMw, shiftMw);
     cccval(i) = sum(sum(sum(ccf(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)))));
     %cccval(i)=tom_ccc(mwfixedinvol1(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),shiftVol(round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange),round(boxsize/2-zoomrange):round(boxsize/2+zoomrange)),'norm');
 end
