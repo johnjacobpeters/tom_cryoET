@@ -50,12 +50,12 @@ function new_mask=tom_grow_mask(mask,factor,max_error,filter_cer)
 
 if (nargin < 3)
     max_error=2;
-end;
+end
 
 if (nargin < 4)
     fact4filt_cer=size(mask,1)./128;
     filter_cer=round(3.*fact4filt_cer);
-end;
+end
 
 
 thr_inc=0.1;
@@ -77,15 +77,15 @@ for ii=1:30
         new_num=length(find(bwareaopen(mask_filt > thr_tmp,dust_size,6) ));
         if (new_num > (org_num_of_vox * factor))
             break;
-        end;
-    end;
+        end
+    end
     act_error= ((new_num-(org_num_of_vox * factor))./org_num_of_vox) .* 100;
     thr_tmp=thr_start-(thr_inc.*(i-1));
     %disp(num2str(act_error));
     if (act_error < max_error)
         break;
-    end;
-end;
+    end
+end
 new_mask=bwareaopen(mask_filt>(thr_start-(thr_inc.*i)),dust_size,6);
     
 
