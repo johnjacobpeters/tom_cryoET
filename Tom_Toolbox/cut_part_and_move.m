@@ -3,22 +3,25 @@
 function cut_parts_classNew()
 
 
-maskName_h1='20210309erasecln.mrc';
-listName='20210201_201810XX_ZYZ.star';
+maskName_h1='2021051275708mask.mrc';
+listName='20210507_201810XX_job1227.star';
+%listName='20210201_201810XX_ZYZ.star';
 %listName='20210201_20190321_ZYZ.star';
 %listName='Class3D/job1141/run_it150_data.star';
 %listName='20210201_201909_ZYZ.star';
 %listName='20210201_20191105_ZYZcor226.star';
 %listName='20210201_20191108_ZYZ.star';
 
-output.findWhat='Extract/extract_test/201810XX_MPI/';
+output.findWhat='Extract/job1227/201810XX_MPI/';
+
+%output.findWhat='Extract/extract_test/201810XX_MPI/';
 %output.findWhat='Extract/extract_test/20190321_MPI/';
 %output.findWhat='Extract/extract_test/20190611_MPI/';
 %output.findWhat='Extract/extract_test/20190920_MPI/';
 %output.findWhat='Extract/extract_test/20191105_MPI/';
 %output.findWhat='Extract/extract_test/20191108_MPI/';
 
-output.rplaceWith{1}='Extract/extract_test/201810XX_MPI111/';
+output.rplaceWith{1}='Extract/job1227/201810XX_MPI_reextract1.5x1/';
 %2.62 below has been changed!!!
 
 offSetCenter = [0 0 0]; %in Respect to (unbinned) average
@@ -106,9 +109,10 @@ topLeft = [0 0 0];
 %outH1=tom_permute_bg(volTmp,maskh1Trans,'',0,0,3);
 %outH1=tom_permute_bg(volTmp,maskh1Trans,'',1.1,5,3);
 %outH1=tom_maskWithNoise(volTmp,maskh1Trans,-15,1);
-outH1=tom_maskWithFil(volTmp,maskh1Trans, 2, 1);
+outH1=tom_maskWithFil(volTmp,maskh1Trans, 1.5, 1);
 outH1=tom_permute_bg(outH1,maskh1Trans,'',1.1,5,3);
 outH1 = tom_cut_out(outH1,topLeft,boxsize);
+outH1 = normalize(outH1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %vectTrans=tom_pointrotate(offSetCenter,tmpAng(1),tmpAng(2),tmpAng(3))+tmpShift';
 
