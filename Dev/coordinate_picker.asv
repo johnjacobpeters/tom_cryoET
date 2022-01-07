@@ -1,0 +1,5 @@
+% command = 'mkdir mynew';
+% status = system(command);
+
+cd '/Applications/ChimeraX-1.3.app/Contents/bin'
+[status,cmdout] = system('./ChimeraX /Users/johnpeters/Desktop/Lab/tom_cryoET-main/Extract/extract_tomo/201810XX_MPI/SV5_001_dff/SV5_001_dff000006a_filt.mrc')
