@@ -1,0 +1,58 @@
+<html>  
+<head>
+    <style>     
+        html{     
+        background-color: white;     
+        padding: 5px;     
+        width: 95%;     
+        }     
+        pre {     
+        overflow-x: auto;     
+        white-space: pre-wrap;     
+        white-space: -moz-pre-wrap;     
+        white-space: -pre-wrap;     
+        white-space: -o-pre-wrap;     
+        word-wrap: break-word;     
+        }     
+    </style>     
+    
+    <script type="text/javascript">     
+            
+            function setup(htmlComponent) {     
+            
+				htmlComponent.addEventListener("DataChanged", function(event) {     
+				scrollID =  htmlComponent.Data;     
+					if (scrollID != ''){
+						if(scrollID==="bottom"){         
+							scrollToBottom();     
+						} else if(scrollID==="DOWNLOAD_MCRINSTALLER" || scrollID==="BUILD_MISSING" || scrollID==="SAMPLE_GEN" || scrollID==="USER_REQUESTED_PACKAGE"){     
+							document.getElementById(scrollID).scrollIntoView(true);     
+						} else {     
+							//document.body.innerHTML = document.body.innerHTML + scrollID;     
+							document.body.appendChild(scrollID);                 
+							scrollToBottom();     
+						}    
+						htmlComponent.Data = '';
+					}		
+				});          
+            }     
+            function scrollToBottom(){     
+            var scrollingElement = (document.scrollingElement || document.body);     
+            scrollingElement.scrollTop = scrollingElement.scrollHeight;     
+            }     
+            
+    </script> 
+</head>
+ <body><meta charset="UTF-8">        
+ <pre><font color=blue>mcc -W 'webapp:CRESTA,CONFIG:/private/var/folders/h0/j36j0chx5jz_zf_ldsnjw2n00000gn/T/tpc3d12876_ae4b_41e3_a080_c4e3536fc432.xml' -d /Users/johnpeters/Documents/GitHub/tom_cryoET/CRESTA -v -C /Users/johnpeters/Documents/GitHub/tom_cryoET/Demo_App_v1_2.mlapp</font>
+Compiler version: 8.2 (R2021a)
+Analyzing file dependencies. 
+[Warning: Web apps that generate additional windows or apps are currently not supported. Check the following .mlapp files for
+window and app dependencies:
+/Users/johnpeters/Documents/GitHub/tom_cryoET/Demo_App_v1_2.mlapp] 
+[Warning: Any function in your web app that generates additional window is currently not supported. Check the following
+function(s) that generates additional window: errordlg,helpdlg,msgbox,uigetdir] 
+Parsing file "/Users/johnpeters/Documents/GitHub/tom_cryoET/Demo_App_v1_2.mlapp"
+	(referenced from command line).
+
+</pre></body></html>

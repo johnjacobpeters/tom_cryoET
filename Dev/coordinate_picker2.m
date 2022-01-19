@@ -4,7 +4,7 @@ function []=coordinate_picker(cubesize, listName, dir, out, boxsize, pxsz)
 output.findWhat = dir;
 
 
-%% Code
+%% old Code
 [fileNames,angles,shifts,list,PickPos]=readList(listName, pxsz);
 maskh1=zeros(boxsizeog, boxsizeog, boxsizeog); 
 maskh1(round((boxsizeog-cubesize)/2):boxsizeog-round((boxsizeog-cubesize)/2),round((boxsizeog-cubesize)/2):boxsizeog-round((boxsizeog-cubesize)/2),round((boxsizeog-cubesize)/2):boxsizeog-round((boxsizeog-cubesize)/2))=1;
@@ -78,6 +78,7 @@ if (strcmp(nameLeft,filename))
     error(['check output find what: ' filename ' == ' nameLeft])
 end
 
+<<<<<<< HEAD
 
 
 
@@ -137,3 +138,5 @@ Input_ChimeraX_command_file = '/Users/johnpeters/Documents/GitHub/tom_cryoET/Dev
 
 
 
+=======
+>>>>>>> 0ce2c4c627ebaf72781d2a2fe72daf0986be11da
