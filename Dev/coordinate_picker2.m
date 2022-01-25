@@ -1,21 +1,40 @@
 %% new code below ..needs total reworking
-% adjusted for relion (crt f 2.62)
-function []=coordinate_picker(cubesize, listName, dir, out, boxsize, pxsz)
+
+
+function []=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir)
 output.findWhat = dir;
+%Input_ChimeraX_command_file = '/Users/johnpeters/Documents/GitHub/tom_cryoET/Dev/chimera3.cxc';
 
-
-%% old Code
+%% Code executed
 [fileNames,angles,shifts,list,PickPos]=readList(listName, pxsz);
-maskh1=zeros(boxsizeog, boxsizeog, boxsizeog); 
-maskh1(round((boxsizeog-cubesize)/2):boxsizeog-round((boxsizeog-cubesize)/2),round((boxsizeog-cubesize)/2):boxsizeog-round((boxsizeog-cubesize)/2),round((boxsizeog-cubesize)/2):boxsizeog-round((boxsizeog-cubesize)/2))=1;
-
 waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
+
+%initialize cell
+cxc_out = cell(4,1);
+cxc_out{1} = 'open test;';
+cxc_out{2} = 'set bgColor white;volume #1 level 0.7;';
+cxc_out{3} = 'color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;';
+cxc_out{4} = 'ui mousemode right "mark point";';
+writecell(cxc_out, 'cxcchim3temp.txt')
+[status, result]=system(['sed s/\"//g ', 'cxcchim3temp.txt', ' > ', 'chim3temp.cxc']);
+[status, result]=system(['sed s/mark/\"mark/g ', 'chim3temp.cxc', ' > ', 'chim3temp2.cxc']);
+[status, result]=system(['sed s/point\;/\point\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp3.cxc']);
+
 parfor i=1:length(fileNames)
-    [outH1, posNew(:,i)]=processParticle(fileNames{i},angles(:,i)',shifts(:,i),maskh1,PickPos(:,i)',offSetCenter,boxsizeog,cubesize);
-    writeParticle(fileNames{i},outH1, output);
-    waitbar.update;
+    getdir= pwd;
+    fulldir = [getdir, '/', output.findWhat];
+    tmpflnam = [fulldir,fileNames{i}];
+    [status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
+    if not(isfolder('cmm_files'))
+        mkdir('cmm_files')
+    end
+    pickCoord(fileNames{i}, ChimeraX_dir, 'chim3cur.cxc');
+    %writeCoords(fileNames{i},outH1, output);
+    %waitbar.update;
 end
 waitbar.close();
+
+
 
 disp('done ');
 
@@ -41,49 +60,36 @@ if (strcmp(ext,'.star'))
         Align(1,i).Shift.Z = shifts(3,i);
     end
 end
-disp(' ');
+disp(' Star file read ');
 
-function [outH1,posNew]=processParticle(filename,tmpAng,tmpShift,maskh1,PickPos,offSetCenter,boxsizeog, cubesize)
+function [outPC1]=pickCoord(filename,ChimeraX_dir, Input_ChimeraX_command_file)
+%% actual code
 
-volTmp=tom_mrcread(filename); volTmp=volTmp.Value;
-maskh1Trans=tom_shift(tom_rotate(maskh1,tmpAng),tmpShift');
-maskh1Trans=maskh1Trans>0.14;
-
-
-vectTrans=tom_pointrotate(offSetCenter,tmpAng(1),tmpAng(2),tmpAng(3))+tmpShift';
-posNew=(round(vectTrans)+PickPos)';
-topLeft = [round((boxsizeog-cubesize)/2),round((boxsizeog-cubesize)/2),round((boxsizeog-cubesize)/2)];
-%topLeft = [0 0 0];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%cut and filter
-outH1=volTmp;
-outH1 = tom_cut_out(outH1,topLeft,[cubesize cubesize cubesize]);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% for i = 1:length(ls(*filt.mrc))
+%     print(i)
+% end
+[status,cmdout] = system([ChimeraX_dir '/ChimeraX ' Input_ChimeraX_command_file]);
+output = strrep(filename,'.mrc','.cmm');
+level = wildcardPattern + "/";
+pat = asManyOfPattern(level);
+outputname = extractAfter(output,pat)
 
 
-function writeParticle(filename,outH1,output)
-
-nameLeft=strrep(filename,output.findWhat,output.rplaceWith{1});
-
-
-pFoldLeft=fileparts(nameLeft);
-
-
-warning off; mkdir(pFoldLeft); warning on;
-
-
-
-if (strcmp(nameLeft,filename))
-    error(['check output find what: ' filename ' == ' nameLeft])
+if isfile('coord.cmm')
+     [status,cmdout] = system(['mv coord.cmm cmm_files/', outputname]);
+else
+     disp('no coords')
 end
 
-<<<<<<< HEAD
 
 
 
 
-tom_mrcwrite(outH1,'name',nameLeft);
+
+
+function writeCoords(filename,outH1,output)
+
+
 
 
 
@@ -118,25 +124,3 @@ for i=1:nr
     Align(run,i).Filter = [0 0]; %is particle filtered with bandpas
     
 end
-
-
-
-
-
-
-%% actual code
-
-ChimeraX_dir = '/Applications/ChimeraX-1.3.app/Contents/bin';
-Input_ChimeraX_command_file = '/Users/johnpeters/Documents/GitHub/tom_cryoET/Dev/chimera3.cxc';
-
-
-% for i = 1:length(ls(*filt.mrc))
-%     print(i)
-% end
-[status,cmdout] = system([ChimeraX_dir '/ChimeraX ' Input_ChimeraX_command_file]);
-
-
-
-
-=======
->>>>>>> 0ce2c4c627ebaf72781d2a2fe72daf0986be11da
