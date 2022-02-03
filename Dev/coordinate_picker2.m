@@ -1,18 +1,17 @@
-%% new code below ..needs total reworking
+%% new code below 
 
 
-function []=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir)
+function [fnlength]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex)
 output.findWhat = dir;
-%Input_ChimeraX_command_file = '/Users/johnpeters/Documents/GitHub/tom_cryoET/Dev/chimera3.cxc';
 
 %% Code executed
 [fileNames,angles,shifts,list,PickPos]=readList(listName, pxsz);
-waitbar=tom_progress(length(fileNames),['found: ' num2str(length(fileNames))]); 
+fnlength = num2str(length(fileNames)); 
 
 %initialize cell
 cxc_out = cell(4,1);
 cxc_out{1} = 'open test;';
-cxc_out{2} = 'set bgColor white;volume #1 level 0.7;';
+cxc_out{2} = ['set bgColor white;volume #1 level ',levels,';'];
 cxc_out{3} = 'color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;';
 cxc_out{4} = 'ui mousemode right "mark point";';
 writecell(cxc_out, 'cxcchim3temp.txt')
@@ -20,23 +19,18 @@ writecell(cxc_out, 'cxcchim3temp.txt')
 [status, result]=system(['sed s/mark/\"mark/g ', 'chim3temp.cxc', ' > ', 'chim3temp2.cxc']);
 [status, result]=system(['sed s/point\;/\point\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp3.cxc']);
 
-parfor i=1:length(fileNames)
-    getdir= pwd;
-    fulldir = [getdir, '/', output.findWhat];
-    tmpflnam = [fulldir,fileNames{i}];
-    [status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
-    if not(isfolder('cmm_files'))
-        mkdir('cmm_files')
-    end
-    pickCoord(fileNames{i}, ChimeraX_dir, 'chim3cur.cxc');
-    %writeCoords(fileNames{i},outH1, output);
-    %waitbar.update;
+getdir= pwd;
+fulldir = [getdir, '/', output.findWhat];
+tmpflnam = [fulldir,fileNames{curindex}];
+[status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
+if not(isfolder('cmm_files'))
+    mkdir('cmm_files')
 end
-waitbar.close();
+pickCoord(fileNames{curindex}, ChimeraX_dir, 'chim3cur.cxc');
 
 
 
-disp('done ');
+
 
 
 function [fileNames,angles,shifts,list,PickPos]=readList(listName,pxsz)
@@ -60,7 +54,6 @@ if (strcmp(ext,'.star'))
         Align(1,i).Shift.Z = shifts(3,i);
     end
 end
-disp(' Star file read ');
 
 function [outPC1]=pickCoord(filename,ChimeraX_dir, Input_ChimeraX_command_file)
 %% actual code
