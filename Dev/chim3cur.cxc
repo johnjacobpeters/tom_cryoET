@@ -1,4 +1,4 @@
-open /Users/johnpeters/Documents/GitHub/tom_cryoET/Dev/Test_Data/Extract/extract_test/201810XX_MPI/SV5_001_dff/SV5_001_dff000016a_filt.mrc;
-set bgColor white;volume #1 level 0.7;
+open /Users/johnpeters/Documents/GitHub/tom_cryoET/Dev/Test_Data/Extract/extract_test/201810XX_MPI/SV5_001_dff/SV5_001_dff000021a_filt.mrc;
+set bgColor white;volume #1 level 0.5;
 color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;
 ui mousemode right "mark point"

@@ -1,5 +1,4 @@
 <marker_set name="markers">
-<marker id="1" x="142.61" y="131.3" z="128.69" r="1" g="1" b="0" radius="1"/>
-<marker id="2" x="121.87" y="126.32" z="129.16" r="1" g="1" b="0" radius="1"/>
-<marker id="3" x="98.828" y="120.99" z="124" r="1" g="1" b="0" radius="1"/>
+<marker id="1" x="134.4" y="132.3" z="131.04" r="1" g="1" b="0" radius="1"/>
+<marker id="2" x="132.32" y="170.04" z="135.89" r="1" g="1" b="0" radius="1"/>
 </marker_set>
