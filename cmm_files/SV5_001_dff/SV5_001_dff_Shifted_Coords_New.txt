@@ -1,0 +1,16 @@
+1871 488 1278 cmm_files/SV5_001_dff/SV5_001_dff000006a_filt.cmm
+1867 515 1269 cmm_files/SV5_001_dff/SV5_001_dff000006a_filt.cmm
+1881 489 1271 cmm_files/SV5_001_dff/SV5_001_dff000006b_filt.cmm
+1821 469 1260 cmm_files/SV5_001_dff/SV5_001_dff000006b_filt.cmm
+1871 488 1278 cmm_files/SV5_001_dff/SV5_001_dff000006a_filt.cmm
+1867 515 1269 cmm_files/SV5_001_dff/SV5_001_dff000006a_filt.cmm
+1881 489 1271 cmm_files/SV5_001_dff/SV5_001_dff000006b_filt.cmm
+1821 469 1260 cmm_files/SV5_001_dff/SV5_001_dff000006b_filt.cmm
+1871 488 1278 
+1867 515 1269 
+1881 489 1271 
+1821 469 1260 
+1864 484 1268 
+1864 484 1268 
+1864 484 1268 
+1864 484 1268 
