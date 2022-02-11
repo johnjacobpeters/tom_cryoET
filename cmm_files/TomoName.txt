@@ -1,5 +1,3 @@
 SV5_001_dff
 SV5_001_dff
-SV5_001_dff
-SV5_001_dff
 SV5_003_dff

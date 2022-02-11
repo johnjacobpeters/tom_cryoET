@@ -64,11 +64,13 @@ else
 		sed "${i}q;d" $OUT/NameCoord.txt | xargs -I{} basename {} .cmm | xargs -I{} grep {} $DIR/*.star | awk -F" " '{print $2, $3, $4}' >> $OUT/Orig_coord.txt;
 	done
 fi
-paste $OUT/Orig_coord.txt $OUT/Together_Cor_Round.txt | awk '{ print ($1-$4), ($2-$5), ($3-$6) }' >> $OUT/Shifted_Coords.txt;
+#paste $OUT/Orig_coord.txt $OUT/Together_Cor_Round.txt | awk '{ print ($1-$4), ($2-$5), ($3-$6) }' >> $OUT/Shifted_Coords.txt;
 
 Name=$(basename $Tomo);
 
-paste -d " " $OUT/Shifted_Coords.txt $OUT/NameCoord.txt > $Tomo/$Name"_Shifted_Coords_New.txt";
+paste $OUT/Orig_coord.txt $OUT/Together_Cor_Round.txt | awk '{ print ($1-$4), ($2-$5), ($3-$6) }' >> $Tomo/$Name".coordsshift";
+
+#paste -d " " $OUT/Shifted_Coords.txt $OUT/NameCoord.txt > $Tomo/$Name".coordsshift";
 
 echo "All Done" $Name
 
