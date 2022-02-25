@@ -2,3 +2,4 @@
 "set bgColor white;volume #1 level 0.7;"
 "color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;"
 "ui mousemode right ""mark point"";"
+"ui tool show ""Side View"";"
