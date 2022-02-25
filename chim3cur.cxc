@@ -1,5 +1,5 @@
-open /Users/johnpeters/Documents/GitHub/tom_cryoET/Test_Data/Extract/extract_tomo/201810XX_MPI/SV4_003_dff/SV4_003_dff000013_filt.mrc;
-set bgColor white;volume #1 level 0.7;
+open /Users/johnpeters/Documents/GitHub/tom_cryoET/Test_Data/Extract/extract_tomo/201810XX_MPI/SV4_003_dff/SV4_003_dff000026_filt.mrc;
+set bgColor white;volume #1 level 0.5;
 color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;
 ui mousemode right "mark point"
 ui tool show "Side View"
