@@ -1,4 +1,0 @@
-cmm_files/SV5_001_dff/SV5_001_dff000006a_filt.cmm
-cmm_files/SV5_001_dff/SV5_001_dff000006a_filt.cmm
-cmm_files/SV5_001_dff/SV5_001_dff000006b_filt.cmm
-cmm_files/SV5_001_dff/SV5_001_dff000006b_filt.cmm
