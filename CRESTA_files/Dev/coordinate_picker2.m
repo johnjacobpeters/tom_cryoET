@@ -22,8 +22,8 @@ writecell(cxc_out, 'cxcchim3temp.txt')
 [status, result]=system(['sed s/surface\;/\surface\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp5.cxc']);
 [status, result]=system(['sed s/Side/\"Side/g ', 'chim3temp5.cxc', ' > ', 'chim3temp4.cxc']);
 [status, result]=system(['sed s/View\;/\View\"/g ', 'chim3temp4.cxc', ' > ', 'chim3temp3.cxc']);
-getdir= pwd;
-fulldir = [getdir, '/', output.findWhat];
+%getdir= pwd;
+fulldir = output.findWhat;%[getdir, '/', output.findWhat];
 tmpflnam = [fulldir,fileNames{curindex}];
 [status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
 if not(isfolder('cmm_files'))
