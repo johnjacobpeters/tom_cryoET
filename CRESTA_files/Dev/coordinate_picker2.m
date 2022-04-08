@@ -19,7 +19,7 @@ cxc_out{5} = 'ui tool show "Side View";';
 writecell(cxc_out, 'cxcchim3temp.txt')
 [status, result]=system(['sed s/\"//g ', 'cxcchim3temp.txt', ' > ', 'chim3temp.cxc']);
 [status, result]=system(['sed s/mark/\"mark/g ', 'chim3temp.cxc', ' > ', 'chim3temp2.cxc']);
-[status, result]=system(['sed s/point\;/\point\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp5.cxc']);
+[status, result]=system(['sed s/surface\;/\surface\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp5.cxc']);
 [status, result]=system(['sed s/Side/\"Side/g ', 'chim3temp5.cxc', ' > ', 'chim3temp4.cxc']);
 [status, result]=system(['sed s/View\;/\View\"/g ', 'chim3temp4.cxc', ' > ', 'chim3temp3.cxc']);
 getdir= pwd;
