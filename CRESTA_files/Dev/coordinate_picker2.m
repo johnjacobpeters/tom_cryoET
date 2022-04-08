@@ -1,7 +1,7 @@
 %% new code below 
 
 
-function [fnlength]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex)
+function [fnlength,fileNames]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex)
 output.findWhat = dir;
 
 %% Code executed
