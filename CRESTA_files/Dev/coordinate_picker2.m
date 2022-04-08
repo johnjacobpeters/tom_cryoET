@@ -1,35 +1,36 @@
 %% new code below 
 
 
-function [fnlength,fileNames]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex)
+function [fnlength,fileNames]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex,testindex)
 output.findWhat = dir;
 
 %% Code executed
 [fileNames,angles,shifts,list,PickPos]=readList(listName, pxsz);
 fnlength = num2str(length(fileNames)); 
+if testindex == 1
+    %initialize cell
+    cxc_out = cell(5,1);
+    cxc_out{1} = 'open test;';
+    cxc_out{2} = ['set bgColor white;volume #1 level ',levels,';'];
+    cxc_out{3} = 'color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;';
+    cxc_out{4} = 'ui mousemode right "mark surface";';
+    cxc_out{5} = 'ui tool show "Side View";';
 
-%initialize cell
-cxc_out = cell(5,1);
-cxc_out{1} = 'open test;';
-cxc_out{2} = ['set bgColor white;volume #1 level ',levels,';'];
-cxc_out{3} = 'color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;';
-cxc_out{4} = 'ui mousemode right "mark surface";';
-cxc_out{5} = 'ui tool show "Side View";';
-
-writecell(cxc_out, 'cxcchim3temp.txt')
-[status, result]=system(['sed s/\"//g ', 'cxcchim3temp.txt', ' > ', 'chim3temp.cxc']);
-[status, result]=system(['sed s/mark/\"mark/g ', 'chim3temp.cxc', ' > ', 'chim3temp2.cxc']);
-[status, result]=system(['sed s/surface\;/\surface\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp5.cxc']);
-[status, result]=system(['sed s/Side/\"Side/g ', 'chim3temp5.cxc', ' > ', 'chim3temp4.cxc']);
-[status, result]=system(['sed s/View\;/\View\"/g ', 'chim3temp4.cxc', ' > ', 'chim3temp3.cxc']);
-%getdir= pwd;
-fulldir = output.findWhat;%[getdir, '/', output.findWhat];
-tmpflnam = [fulldir,fileNames{curindex}];
-[status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
-if not(isfolder('cmm_files'))
-    mkdir('cmm_files')
+    writecell(cxc_out, 'cxcchim3temp.txt')
+    [status, result]=system(['sed s/\"//g ', 'cxcchim3temp.txt', ' > ', 'chim3temp.cxc']);
+    [status, result]=system(['sed s/mark/\"mark/g ', 'chim3temp.cxc', ' > ', 'chim3temp2.cxc']);
+    [status, result]=system(['sed s/surface\;/\surface\"/g ', 'chim3temp2.cxc', ' > ', 'chim3temp5.cxc']);
+    [status, result]=system(['sed s/Side/\"Side/g ', 'chim3temp5.cxc', ' > ', 'chim3temp4.cxc']);
+    [status, result]=system(['sed s/View\;/\View\"/g ', 'chim3temp4.cxc', ' > ', 'chim3temp3.cxc']);
+    %getdir= pwd;
+    fulldir = output.findWhat;%[getdir, '/', output.findWhat];
+    tmpflnam = [fulldir,fileNames{curindex}];
+    [status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
+    if not(isfolder('cmm_files'))
+        mkdir('cmm_files')
+    end
+    pickCoord(fileNames{curindex}, ChimeraX_dir, 'chim3cur.cxc');
 end
-pickCoord(fileNames{curindex}, ChimeraX_dir, 'chim3cur.cxc');
 
 
 
