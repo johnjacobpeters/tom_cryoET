@@ -13,7 +13,7 @@ cxc_out = cell(5,1);
 cxc_out{1} = 'open test;';
 cxc_out{2} = ['set bgColor white;volume #1 level ',levels,';'];
 cxc_out{3} = 'color radial #1.1 palette #ff0000:#ff7f7f:#ffffff:#7f7fff:#0000ff center 127.5,127.5,127.5;';
-cxc_out{4} = 'ui mousemode right "mark point";';
+cxc_out{4} = 'ui mousemode right "mark surface";';
 cxc_out{5} = 'ui tool show "Side View";';
 
 writecell(cxc_out, 'cxcchim3temp.txt')
