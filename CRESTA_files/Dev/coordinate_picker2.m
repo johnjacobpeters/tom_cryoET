@@ -1,7 +1,7 @@
 %% new code below 
 
 
-function [fnlength,fileNames]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex,testindex)
+function [fnlength,fileNames, statstat]=coordinate_picker2(listName, dir, pxsz,ChimeraX_dir, levels,curindex,testindex, cmmdir)
 output.findWhat = dir;
 
 %% Code executed
@@ -26,10 +26,10 @@ if testindex == 1
     fulldir = output.findWhat;%[getdir, '/', output.findWhat];
     tmpflnam = [fulldir,fileNames{curindex}];
     [status, result]=system(['sed s+test+', tmpflnam, '+g ', 'chim3temp3.cxc', ' > ', 'chim3cur.cxc']);
-    if not(isfolder('cmm_files'))
-        mkdir('cmm_files')
+    if not(isfolder([cmmdir,'cmm_files']))
+        mkdir([cmmdir,'cmm_files'])
     end
-    pickCoord(fileNames{curindex}, ChimeraX_dir, 'chim3cur.cxc');
+    [statstat] = pickCoord(fileNames{curindex}, ChimeraX_dir, 'chim3cur.cxc',cmmdir);
 end
 
 
@@ -59,7 +59,7 @@ if (strcmp(ext,'.star'))
     end
 end
 
-function [outPC1]=pickCoord(filename,ChimeraX_dir, Input_ChimeraX_command_file)
+function [statstat]=pickCoord(filename,ChimeraX_dir, Input_ChimeraX_command_file,cmmdir)
 %% actual code
 
 % for i = 1:length(ls(*filt.mrc))
@@ -73,9 +73,11 @@ outputname = extractAfter(output,pat)
 
 
 if isfile('coord.cmm')
-     [status,cmdout] = system(['mv coord.cmm cmm_files/', outputname]);
+     [status,cmdout] = system(['mv coord.cmm ', cmmdir, 'cmm_files/', outputname]);
+     statstat=1;
 else
      disp('no coords')
+     statstat=0;
 end
 
 
