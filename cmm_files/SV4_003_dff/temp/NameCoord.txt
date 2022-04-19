@@ -1,0 +1,3 @@
+/Users/johnpeters/Documents/GitHub/tom_cryoET/cmm_files/SV4_003_dff/SV4_003_dff000026_filt.cmm
+/Users/johnpeters/Documents/GitHub/tom_cryoET/cmm_files/SV4_003_dff/SV4_003_dff000013_filt.cmm
+/Users/johnpeters/Documents/GitHub/tom_cryoET/cmm_files/SV4_003_dff/SV4_003_dff000026_filt.cmm

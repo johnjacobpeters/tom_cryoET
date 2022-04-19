@@ -1,7 +1,5 @@
 Make all directories compatible with and without slash at the end
 
 Coord picker
-Add output directory for cmm files, 
+
 load settings file in chimera to allow for different sized points
-add putative star path based on index
-save example subtomogram path into a text file
