@@ -79,10 +79,10 @@ then
 	length=$(cat $OUT/NameCoord.txt | wc -l);
 	for i in $(seq 1 $length );
 		do
-		sed "${i}q;d" $OUT/NameCoord.txt | xargs -I{} basename {} _filt.cmm | xargs -I{} grep {} $StarFileDir | awk -v X=$Xcor -v Y=$Ycor -v Z=$Zcor -F" " '{print $a, $b, $c}' >> $OUT/Orig_coord.txt
+		sed "${i}q;d" $OUT/NameCoord.txt | xargs -I{} basename {} _filt.cmm | xargs -I{} grep {} $StarFileDir | awk -v X=$Xcor -v Y=$Ycor -v Z=$Zcor -F" " '{print $X, $Y, $Z}' >> $OUT/Orig_coord.txt
 			##elif [ "$a" -eq 2 ]
 			##then
-		##sed "${i}q;d" $OUT/NameCoord.txt | xargs -I{} basename {} _filt.cmm | xargs -I{} grep {} $StarFileDir | awk -v X=$Xcor -v Y=$Ycor -v Z=$Zcor -F" " '{print $a, $b, $c}' >> $OUT/Orig_coord.txt;
+		##sed "${i}q;d" $OUT/NameCoord.txt | xargs -I{} basename {} _filt.cmm | xargs -I{} grep {} $StarFileDir | awk -v X=$Xcor -v Y=$Ycor -v Z=$Zcor -F" " '{print $X, $Y, $Z}' >> $OUT/Orig_coord.txt;
 			##fi
 	done
 else
