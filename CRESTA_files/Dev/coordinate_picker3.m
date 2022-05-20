@@ -73,8 +73,8 @@ pat = asManyOfPattern(level);
 outputname = extractAfter(output,pat)
 
 
-if isfile('coord.cmm')
-     [status,cmdout] = system(['mv coord.cmm ', cmmdir, 'cmm_files/', outputname]);
+if isfile('coords.cmm')
+     [status,cmdout] = system(['mv coords.cmm ', cmmdir, 'cmm_files/', outputname]);
      statstat=1;
 else
      disp('no coords')
